@@ -18,6 +18,7 @@
     "israeli-bank-scrapers": "^2.2.0",
     "js-yaml": "^4.1.0",
     "moment": "^2.29.4",
+    "node-cron": "^3.0.2",
     "object-hash": "^3.0.0"
   }
 }

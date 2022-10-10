@@ -13,7 +13,7 @@ Current state:
 - [ ] Add tools like linter github actions and more...
 - [ ] Consider use typescript
 - [ ] Support changing config after first run
-- [ ] Work with cron
+- [x] Work with cron
 - [ ] Support multi banks
 - [ ] Get approve of my mandatory PRs [[1](https://github.com/eshaham/israeli-bank-scrapers/pull/726), [2](https://github.com/eshaham/israeli-bank-scrapers/pull/728)] in [Israeli bank scrapper](https://github.com/eshaham/israeli-bank-scrapers), or use my fork.
 
