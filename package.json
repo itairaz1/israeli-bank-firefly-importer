@@ -11,7 +11,7 @@
   },
   "author": "Itai Raz",
   "license": "MIT",
-  "repository": "",
+  "repository": "https://github.com/itairaz1/israeli-bank-firefly-importer",
   "dependencies": {
     "axios": "^0.27.2",
     "config": "^3.3.8",
