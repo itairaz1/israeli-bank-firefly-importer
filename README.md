@@ -9,8 +9,8 @@ Current state:
 - [x] Working flow without personal dependencies
 - [ ] Documentations
 - [ ] Support all banks and credit cards
-- [ ] Code quality: Add tests, error handling, organize code and more
-- [ ] Add tools like linter, github actions and more...
+- [ ] Code quality: Add tests, error handling, organize code, normal logger and more
+- [ ] Add tools like linter github actions and more...
 - [ ] Consider use typescript
 - [ ] Support changing config after first run
 - [ ] Work with cron
