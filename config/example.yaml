@@ -1,0 +1,31 @@
+firefly:
+  baseUrl: 'http://my-hosted-firefly.local'
+  tokenApi: 'my-token'
+banks:
+  - type: leumi
+    name: bank
+    credentials:
+      username: 'my-username'
+      password: 'my-password'
+    creditCards:
+      - type: isracard
+        credentials:
+          id: '123456789'
+          card6Digits: '123456'
+          password: 'my-password'
+      - type: visaCal
+        credentials:
+          username: 'my-username'
+          password: 'my-password'
+scraper:
+  args:
+    - '--disable-dev-shm-usage'
+    - '--disable-setuid-sandbox'
+    - '--no-sandbox'
+    - '--no-zygote'
+    - '--disable-gpu'
+    - '--disable-audio-output'
+    - '--headless'
+    - '--single-process'
+
+

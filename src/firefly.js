@@ -1,0 +1,103 @@
+import config from 'config';
+import axios from 'axios';
+import qs from 'node:querystring';
+
+const fireflyConfig = config.firefly;
+let fireflyAxios = new axios.create({ headers: getHeader(), baseURL: fireflyConfig.baseUrl });
+
+export async function searchTxs(options) {
+  const query = Object.keys(options).reduce((m, x) => `${m} ${x}:${options[x]}`, '').trim();
+  let page = 1;
+  let totalPages = 1;
+  const fireFlyData = [];
+  while (page <= totalPages) {
+    const res = await fireflyAxios.get(`/api/v1/search/transactions`, {
+      params: { query, page },
+    });
+
+    console.log(`Got page ${res.data.meta.pagination.current_page} out of ${res.data.meta.pagination.total_pages}`);
+
+    fireFlyData.push(...res.data.data);
+    totalPages = res.data.meta.pagination.total_pages;
+    page++;
+  }
+
+  return fireFlyData;
+
+}
+
+export async function getAllTxs() {
+  let nextPage = `/api/v1/transactions`;
+  const fireFlyData = [];
+  while (nextPage) {
+    const res = await fireflyAxios.get(nextPage);
+
+    console.log(`Got page ${res.data.meta.pagination.current_page} out of ${res.data.meta.pagination.total_pages}`);
+
+    fireFlyData.push(...res.data.data);
+    nextPage = res.data.links.next;
+  }
+
+  return fireFlyData;
+}
+
+const getTxsByTagCache = {};
+
+export async function getTxsByTag(tag) {
+  if (getTxsByTagCache[tag]) {
+    return getTxsByTagCache[tag];
+  }
+  let nextPage = `/api/v1/tags/${tag}/transactions`;
+  const fireFlyData = [];
+  while (nextPage) {
+    let res;
+    try {
+      res = await fireflyAxios.get(nextPage);
+    } catch (e) {
+      if (e.response.status === 404) {
+        return [];
+      }
+    }
+
+    fireFlyData.push(...res.data.data);
+    nextPage = res.data.links.next;
+  }
+  getTxsByTagCache[tag] = fireFlyData;
+  return fireFlyData;
+}
+
+export function createTx(transactions) {
+  return fireflyAxios.post(`/api/v1/transactions`, { transactions });
+}
+
+export function updateTx(id, transactions) {
+  return fireflyAxios.put(`/api/v1/transactions/${id}`, { transactions });
+}
+
+export function deleteTx(id) {
+  return fireflyAxios.delete(`/api/v1/transactions/${id}`);
+}
+
+export function getAccounts() {
+  return fireflyAxios.get(`/api/v1/accounts`);
+}
+
+export function createAccount(data) {
+  return fireflyAxios.post(`/api/v1/accounts`, data);
+}
+
+export function setConfig(key, value) {
+  return fireflyAxios.put(`/api/v1/preferences/israeli-bank-importer`, { [key]: value });
+}
+
+export function createConfig(key, value) {
+  return fireflyAxios.post(`/api/v1/preferences`, { name: 'israeli-bank-importer', data: { [key]: value } });
+}
+
+export function getConfig() {
+  return fireflyAxios.get(`/api/v1/preferences/israeli-bank-importer`);
+}
+
+function getHeader() {
+  return { 'Authorization': `Bearer ${fireflyConfig.tokenApi}` };
+}
