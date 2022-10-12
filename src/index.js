@@ -5,10 +5,11 @@ import moment from 'moment';
 import config from 'config';
 import { schedule } from 'node-cron';
 
+await run();
+
 if (config.cron) {
+  console.log(`Running with cron '${config.cron}'`)
   schedule(config.cron, run);
-} else {
-  run();
 }
 
 async function run() {
