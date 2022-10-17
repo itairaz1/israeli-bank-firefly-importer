@@ -15,7 +15,7 @@ Current state:
 - [ ] Support changing config after first run
 - [x] Work with cron
 - [ ] Support multi banks
-- [ ] Get approve of my mandatory PRs [[1](https://github.com/eshaham/israeli-bank-scrapers/pull/726), [2](https://github.com/eshaham/israeli-bank-scrapers/pull/728)] in [Israeli bank scrapper](https://github.com/eshaham/israeli-bank-scrapers), or use my fork.
+- [x] Get approve of my mandatory PRs.
 
 Much more to complete here...
 
