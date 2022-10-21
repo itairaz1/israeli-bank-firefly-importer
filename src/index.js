@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import './load-config.js';
 import { doImport } from './importer/index.js';
 import { createConfig, getConfig } from './firefly.js';

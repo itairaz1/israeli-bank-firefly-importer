@@ -9,6 +9,10 @@
     "start": "node src/index.js",
     "docker-start": "npm start"
   },
+  "bin": {
+    "@itair86/israeli-bank-firefly-importer": "src/index.js",
+    "israeli-bank-firefly-importer": "src/index.js"
+  },
   "author": "Itai Raz",
   "license": "MIT",
   "repository": "https://github.com/itairaz1/israeli-bank-firefly-importer",
