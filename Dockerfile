@@ -14,6 +14,6 @@ RUN npm ci
 # the rest of your dockerfile here
 COPY . .
 
-ENV CONFIG_PATH='/config'
+ENV IBFI_CONFIG_PATH='/config'
 
 CMD ["npm", "start"]
