@@ -21,10 +21,10 @@ function enrichAccount(accounts, currentAccount, scrappedAccounts) {
 }
 
 export async function getScrappedAccounts(since, useOnlyAccounts) {
-  const flatAccounts = banksConfig.flatMap((x, i) => ([toAccountOptions(x), ...x.creditCards.map(y => toAccountOptions(y, i))]))
+  const flatAccounts = banksConfig.flatMap((x, i) => ([toAccountOptions(x), ...(x.creditCards || []).map(y => toAccountOptions(y, i))]))
     .filter(x => !useOnlyAccounts || useOnlyAccounts.includes(x.name));
 
-  const resPromise = flatAccounts
+  const actions = flatAccounts
     .map(account => {
       const options = {
         companyId: CompanyTypes[account.type],
@@ -35,10 +35,10 @@ export async function getScrappedAccounts(since, useOnlyAccounts) {
         args: scraperConfig.args,
       };
 
-      return scrape(options, account.credentials);
+      return () => scrape(options, account.credentials);
     });
 
-  const results = await Promise.all(resPromise);
+  const results = await runActions(actions, scraperConfig.parallel);
   const error = results
     .map((x, i) => x.success ? null : ({ ...x, options: flatAccounts[i] }))
     .filter(x => x)
@@ -55,4 +55,12 @@ export async function getScrappedAccounts(since, useOnlyAccounts) {
 async function scrape(options, credentials) {
   const scraper = createScraper(options);
   return scraper.scrape(credentials);
+}
+
+function runActions(actions, parallel) {
+  if (parallel) {
+    return Promise.all(actions.map(x => x()));
+  } else {
+    return actions.reduce((m, a) => m.then(async x => [...x, await a()]), Promise.resolve([]));
+  }
 }

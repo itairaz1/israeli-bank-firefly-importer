@@ -1,3 +1,6 @@
 firefly:
   baseUrl: 'FIREFLY_BASE_URL'
   tokenApi: 'FIREFLY_TOKEN_API'
+cron: 'CRON'
+scraper:
+  parallel: 'SCRAPER_PARALLEL'

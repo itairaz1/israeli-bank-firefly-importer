@@ -17,6 +17,7 @@ banks:
         credentials:
           username: 'my-username'
           password: 'my-password'
+cron: '0 0 7 * * *' # Optional, if set, keep the app working and execute by cron.
 scraper:
   args:
     - '--disable-dev-shm-usage'

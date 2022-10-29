@@ -16,4 +16,5 @@ creditCardDesc:
   - desc: 'כרטיסי אשראי-י'
     creditCard: visaCal
 scraper:
+  parallel: true
   args: []
