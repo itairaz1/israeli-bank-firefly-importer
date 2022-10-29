@@ -1,0 +1,3 @@
+firefly:
+  baseUrl: 'FIREFLY_BASE_URL'
+  tokenApi: 'FIREFLY_TOKEN_API'
