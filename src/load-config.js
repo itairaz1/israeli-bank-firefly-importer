@@ -8,5 +8,7 @@ const configDir = resolve(__dirname, '../config');
 
 const configFromEnvVarAsArray = process.env['IBFI_CONFIG_PATH'] ? [process.env['IBFI_CONFIG_PATH']] : [] ;
 const resolvedConfigDirs = [...configFromEnvVarAsArray, configDir].join(delimiter);
-console.log(`Loading config from ${resolvedConfigDirs}`);
 config.util.extendDeep(config, config.util.loadFileConfigs(resolvedConfigDirs));
+
+const { default: logger } = await import('./logger.js');
+logger.debug({path: resolvedConfigDirs}, `Config loaded`);

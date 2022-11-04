@@ -1,5 +1,6 @@
 import { CompanyTypes, createScraper } from 'israeli-bank-scrapers';
 import config from 'config';
+import logger from '../logger.js';
 
 const banksConfig = config.banks;
 const scraperConfig = config.scraper;
@@ -45,7 +46,7 @@ export async function getScrappedAccounts(since, useOnlyAccounts) {
     .map(x => `${x.options.type} ${x.options.name ? ` (${x.options.name})` : ''} failed with type ${x.errorType}: ${x.errorMessage}`)
     .join(', ');
   if (error) {
-    console.log(`Failed with follow error(s): ${error}`);
+    logger.error(error, 'Scrapping failed');
     throw error;
   }
 

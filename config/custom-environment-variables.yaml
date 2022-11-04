@@ -4,3 +4,6 @@ firefly:
 cron: 'CRON'
 scraper:
   parallel: 'SCRAPER_PARALLEL'
+  timeout: 'SCRAPER_TIMEOUT'
+log:
+  level: 'LOG_LEVEL'

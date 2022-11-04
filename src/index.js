@@ -6,11 +6,12 @@ import { createConfig, getConfig } from './firefly.js';
 import moment from 'moment';
 import config from 'config';
 import { schedule } from 'node-cron';
+import logger from './logger.js'
 
 await run();
 
 if (config.cron) {
-  console.log(`Running with cron '${config.cron}'`)
+  logger.info({cron: config.cron}, 'Running with cron');
   schedule(config.cron, run);
 }
 
@@ -28,8 +29,8 @@ async function run() {
     });
 
     await createConfig("lastImport", moment().toISOString())
-      .catch(err => console.log(err));
+      .catch(err => logger.error(err));
   } catch (err) {
-    console.log(`Fatal error: ${err.stack || err}`)
+    logger.error(err, 'Fatal error');
   }
 }

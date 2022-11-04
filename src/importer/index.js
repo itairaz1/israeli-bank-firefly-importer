@@ -1,9 +1,10 @@
 import hash from 'object-hash';
 import { manipulateTxs } from './credit-cards.js';
-import { createAccount, createTx, deleteTx, getAccounts, getAllTxs, getConfig, searchTxs, updateTx } from './../firefly.js';
+import { createAccount, createTx, deleteTx, getAccounts, getAllTxs, searchTxs, updateTx } from './../firefly.js';
 import { getScrappedAccounts } from './scrapper.js';
 import config from 'config';
 import moment from 'moment';
+import logger from './../logger.js';
 
 export async function doImport(options) {
   const skipEdit = options.skipEdit;
@@ -15,10 +16,10 @@ export async function doImport(options) {
     await drop();
   }
 
-  console.log('Getting scrap data...');
+  logger.info('Getting scrap data...');
   const accounts = await getScrappedAccounts(since, onlyAccounts);
 
-  console.log('Getting or creating accounts...');
+  logger.info('Getting or creating accounts...');
   const accountsMaps = await createAndMapAccounts(accounts);
 
   const fireTxs = accounts
@@ -39,10 +40,10 @@ export async function doImport(options) {
       process_date: x.processedDate,
     }));
 
-  console.log('Manipulating...');
+  logger.info('Manipulating...');
   const preparedFireTxs = await manipulateTxs(fireTxs, accountsMaps);
 
-  console.log('Getting map...');
+  logger.info('Getting map...');
   const minimalDate = fireTxs
     .map(x => moment(x.date))
     .reduce((m, x) => x.isBefore(m) ? x : m, moment());
@@ -51,20 +52,20 @@ export async function doImport(options) {
   const currentTxMap = await getExistsTxMap(workingTxs);
 
   const toCreate = preparedFireTxs.filter(x => !currentTxMap[x.external_id]);
-  console.log(`Creating ${toCreate.length} txs to firefly...`);
+  logger.info({ count: toCreate.length }, 'Creating transactions to firefly...');
   await toCreate.reduce((p, x, i) => p.then(() => innerCreateTx(x, i + 1)), Promise.resolve());
 
   const toTypeUpdate = preparedFireTxs.filter(x => currentTxMap[x.external_id] && currentTxMap[x.external_id].type !== x.type);
-  console.log(`Type updating ${toTypeUpdate.length} txs to firefly...`);
+  logger.info({ count: toTypeUpdate.length }, 'Updating transactions types to firefly...');
   await toTypeUpdate.reduce((p, x, i) => p.then(() => innerUpdateTx(currentTxMap[x.external_id], x, i + 1)), Promise.resolve());
 
   if (!skipEdit) {
     const toUpdate = preparedFireTxs.filter(x => currentTxMap[x.external_id] && currentTxMap[x.external_id].type === x.type);
-    console.log(`Updating ${toUpdate.length} txs to firefly...`);
+    logger.info({ count: toUpdate.length }, 'Updating transactions to firefly...');
     await toUpdate.reduce((p, x, i) => p.then(() => innerUpdateTx(currentTxMap[x.external_id], x, i + 1)), Promise.resolve());
   }
 
-  console.log('Done.');
+  logger.info('Done.');
 }
 
 async function getExistsTxMap(fireFlyData) {
@@ -114,21 +115,22 @@ async function createAndMapAccounts(scrapperAccounts) {
 }
 
 async function drop() {
-  console.log('Getting data for drop');
+  logger.info('Getting data for drop');
   const fireFlyData = await getAllTxs();
   const toDrop = fireFlyData
-    .map(x => ({ id: x.id, ...x.attributes.transactions[0] }))
-    .filter(x => x.source_id === '1' || x.destination_id === '1')
-  ;
+    .map(x => ({ id: x.id, ...x.attributes.transactions[0] }));
 
-  console.log(`Dropping ${toDrop.length} txs (out of ${fireFlyData.length})...`);
+  logger.info({
+    count: toDrop.length,
+    total: fireFlyData.length,
+  }, 'Dropping transactions');
 
   let count = 1;
   for (let tx of toDrop) {
     await deleteTx(tx.id);
     count++;
     if (count % 50 === 0) {
-      console.log(`Deleted ${count}`);
+      logger.info({ currentAmount: count }, 'Transactions deleted');
     }
   }
 }
@@ -137,10 +139,10 @@ async function innerCreateTx(tx, count) {
   try {
     await createTx([tx]);
     if (count % 50 === 0) {
-      console.log(`Created ${count} txs.`);
+      logger.info({ currentAmount: count }, 'Transactions created.');
     }
   } catch (e) {
-    console.log(`error ${tx} with ${e.message}`);
+    logger.error({ error: e, tx }, 'Error creating transaction');
   }
 }
 
@@ -153,11 +155,11 @@ async function innerUpdateTx({ id, type }, tx, count) {
       await updateTx(id, [tx]);
     }
     if (count % 50 === 0) {
-      console.log(`Updated ${count} txs.`);
+      logger.info({ currentAmount: count }, 'Transactions updated.');
     }
 
   } catch (e) {
-    console.log(`error ${tx} with ${e.message}`);
+    logger.error({ error: e, tx }, 'Error updating transaction');
   }
 }
 

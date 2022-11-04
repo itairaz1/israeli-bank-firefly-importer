@@ -1,6 +1,6 @@
 import config from 'config';
 import axios from 'axios';
-import qs from 'node:querystring';
+import logger from './logger.js';
 
 const fireflyConfig = config.firefly;
 let fireflyAxios = new axios.create({ headers: getHeader(), baseURL: fireflyConfig.baseUrl });
@@ -15,7 +15,10 @@ export async function searchTxs(options) {
       params: { query, page },
     });
 
-    console.log(`Got page ${res.data.meta.pagination.current_page} out of ${res.data.meta.pagination.total_pages}`);
+    logger.info({
+      currentPage: res.data.meta.pagination.current_page,
+      totalPages: res.data.meta.pagination.total_pages,
+    }, 'Transaction page fetched');
 
     fireFlyData.push(...res.data.data);
     totalPages = res.data.meta.pagination.total_pages;
@@ -32,7 +35,10 @@ export async function getAllTxs() {
   while (nextPage) {
     const res = await fireflyAxios.get(nextPage);
 
-    console.log(`Got page ${res.data.meta.pagination.current_page} out of ${res.data.meta.pagination.total_pages}`);
+    logger.info({
+      currentPage: res.data.meta.pagination.current_page,
+      totalPages: res.data.meta.pagination.total_pages,
+    }, 'Transaction page fetched');
 
     fireFlyData.push(...res.data.data);
     nextPage = res.data.links.next;
