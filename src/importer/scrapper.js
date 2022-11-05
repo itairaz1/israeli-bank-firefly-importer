@@ -1,12 +1,14 @@
 import { CompanyTypes, createScraper } from 'israeli-bank-scrapers';
 import config from 'config';
 import logger from '../logger.js';
+import moment from 'moment';
+import { getLastImport } from './last-import-helper.js';
 
 const banksConfig = config.banks;
 const scraperConfig = config.scraper;
 
-function toAccountOptions(x, i) {
-  return { type: x.type, credentials: x.credentials, parentBankIndex: i, name: x.name };
+function toUserOptions(creditCard, index) {
+  return { type: creditCard.type, credentials: creditCard.credentials, parentBankIndex: index, name: creditCard.name };
 }
 
 function getParentBankAccountNumber(scrappedAccounts, currentAccount) {
@@ -21,36 +23,59 @@ function enrichAccount(accounts, currentAccount, scrappedAccounts) {
   return accounts.map(x => ({ ...x, accountDetails }));
 }
 
-export async function getScrappedAccounts(since, useOnlyAccounts) {
-  const flatAccounts = banksConfig.flatMap((x, i) => ([toAccountOptions(x), ...(x.creditCards || []).map(y => toAccountOptions(y, i))]))
-    .filter(x => !useOnlyAccounts || useOnlyAccounts.includes(x.name));
+function getScrapFrom(account) {
+  if (account.lastImport) {
+    return moment(account.lastImport).subtract(7, 'days');
+  }
 
-  const actions = flatAccounts
-    .map(account => {
+  // Fallback to 5y ago
+  return moment().subtract('5', 'years');
+}
+
+export function getFlatUsers(useOnlyAccounts, state, since) {
+  return banksConfig.flatMap((bank, i) => ([toUserOptions(bank), ...(bank.creditCards || []).map(cc => toUserOptions(cc, i))]))
+    .filter(x => !useOnlyAccounts || useOnlyAccounts.includes(x.name))
+    .map(x => ({ ...x, lastImport: getLastImport(x, state, since) }))
+    .map(x => ({ ...x, scrapFrom: getScrapFrom(x) }));
+}
+
+export function parseScrapResult(results, flatUsers) {
+  return results.reduce((m, x, i) => ([...m, ...(enrichAccount(x.accounts, flatUsers[i], results))]), []);
+}
+
+export function getSuccessfulScrappedUsers(results, flatUsers) {
+  return results
+    .map((x, i) => x.success ? flatUsers[i] : null)
+    .filter(x => x);
+}
+
+export function logErrorResult(results, flatUsers) {
+  const error = results
+    .map((x, i) => x.success ? null : ({ ...x, options: flatUsers[i] }))
+    .filter(x => x)
+    .map(x => `${x.options.type} ${x.options.name ? ` (${x.options.name})` : ''} failed with type ${x.errorType}: ${x.errorMessage}`)
+    .join(', ');
+  if (error) {
+    logger.error(error, 'Scrapping failed. Ignoring...');
+  }
+}
+
+export async function getScrappedAccounts(flatUsers) {
+  const actions = flatUsers
+    .map(user => {
       const options = {
-        companyId: CompanyTypes[account.type],
-        startDate: new Date(since),
+        companyId: CompanyTypes[user.type],
+        startDate: user.scrapFrom.toDate(),
         combineInstallments: false,
         showBrowser: false,
         noFilter: true,
         args: scraperConfig.args,
       };
 
-      return () => scrape(options, account.credentials);
+      return () => scrape(options, user.credentials);
     });
 
-  const results = await runActions(actions, scraperConfig.parallel);
-  const error = results
-    .map((x, i) => x.success ? null : ({ ...x, options: flatAccounts[i] }))
-    .filter(x => x)
-    .map(x => `${x.options.type} ${x.options.name ? ` (${x.options.name})` : ''} failed with type ${x.errorType}: ${x.errorMessage}`)
-    .join(', ');
-  if (error) {
-    logger.error(error, 'Scrapping failed');
-    throw error;
-  }
-
-  return results.reduce((m, x, i) => ([...m, ...(enrichAccount(x.accounts, flatAccounts[i], results))]), []);
+  return runActions(actions, scraperConfig.parallel);
 }
 
 async function scrape(options, credentials) {

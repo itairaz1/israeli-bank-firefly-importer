@@ -92,12 +92,8 @@ export function createAccount(data) {
   return fireflyAxios.post(`/api/v1/accounts`, data);
 }
 
-export function setConfig(key, value) {
-  return fireflyAxios.put(`/api/v1/preferences/israeli-bank-importer`, { [key]: value });
-}
-
-export function createConfig(key, value) {
-  return fireflyAxios.post(`/api/v1/preferences`, { name: 'israeli-bank-importer', data: { [key]: value } });
+export function upsertConfig(state) {
+  return fireflyAxios.post(`/api/v1/preferences`, { name: 'israeli-bank-importer', data: state });
 }
 
 export function getConfig() {

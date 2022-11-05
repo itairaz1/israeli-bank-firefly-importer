@@ -1,23 +1,32 @@
 import hash from 'object-hash';
 import { manipulateTxs } from './credit-cards.js';
-import { createAccount, createTx, deleteTx, getAccounts, getAllTxs, searchTxs, updateTx } from './../firefly.js';
-import { getScrappedAccounts } from './scrapper.js';
+import { createAccount, upsertConfig, createTx, deleteTx, getAccounts, getAllTxs, getConfig, searchTxs, updateTx } from './../firefly.js';
+import { getFlatUsers, getScrappedAccounts, getSuccessfulScrappedUsers, logErrorResult, parseScrapResult } from './scrapper.js';
 import config from 'config';
 import moment from 'moment';
 import logger from './../logger.js';
+import { getStateWithLastImport } from './last-import-helper.js';
 
 export async function doImport(options) {
   const skipEdit = options.skipEdit;
   const onlyAccounts = options.onlyAccounts;
-  const since = options.since;
   const cleanup = options.cleanup;
+  const since = options.since;
 
   if (cleanup) {
     await drop();
   }
 
+  logger.info('Getting state from firefly...');
+  const axiosState = await getConfig();
+  const state = JSON.parse(axiosState.data.data.attributes.data);
+  const lastImportState = state.lastImport;
+
   logger.info('Getting scrap data...');
-  const accounts = await getScrappedAccounts(since, onlyAccounts);
+  const flatUsers = getFlatUsers(onlyAccounts, lastImportState, since);
+  const scrapResult = await getScrappedAccounts(flatUsers);
+  const accounts = parseScrapResult(scrapResult, flatUsers);
+  logErrorResult(scrapResult);
 
   logger.info('Getting or creating accounts...');
   const accountsMaps = await createAndMapAccounts(accounts);
@@ -64,6 +73,11 @@ export async function doImport(options) {
     logger.info({ count: toUpdate.length }, 'Updating transactions to firefly...');
     await toUpdate.reduce((p, x, i) => p.then(() => innerUpdateTx(currentTxMap[x.external_id], x, i + 1)), Promise.resolve());
   }
+
+  logger.info('Updating last import...');
+  const scrappedUsers = getSuccessfulScrappedUsers(scrapResult, flatUsers);
+  const updatedState = getStateWithLastImport(scrappedUsers, state);
+  await upsertConfig(JSON.stringify(updatedState));
 
   logger.info('Done.');
 }
