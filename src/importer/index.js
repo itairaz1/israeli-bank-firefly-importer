@@ -25,8 +25,8 @@ export async function doImport(options) {
   logger.info('Getting scrap data...');
   const flatUsers = getFlatUsers(onlyAccounts, lastImportState, since);
   const scrapResult = await getScrappedAccounts(flatUsers);
-  const accounts = parseScrapResult(scrapResult, flatUsers);
   logErrorResult(scrapResult);
+  const accounts = parseScrapResult(scrapResult, flatUsers);
 
   logger.info('Getting or creating accounts...');
   const accountsMaps = await createAndMapAccounts(accounts);

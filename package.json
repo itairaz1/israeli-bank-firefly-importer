@@ -1,6 +1,6 @@
 {
   "name": "israeli-bank-firefly-importer",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "",
   "main": "index.js",
   "type": "module",
@@ -18,7 +18,7 @@
   "dependencies": {
     "axios": "^0.27.2",
     "config": "^3.3.8",
-    "israeli-bank-scrapers": "^3.0.0",
+    "israeli-bank-scrapers": "^3.1.2",
     "js-yaml": "^4.1.0",
     "moment": "^2.29.4",
     "node-cron": "^3.0.2",
