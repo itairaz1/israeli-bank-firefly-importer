@@ -68,8 +68,8 @@ export async function getScrappedAccounts(flatUsers) {
         startDate: user.scrapFrom.toDate(),
         combineInstallments: false,
         showBrowser: false,
-        noFilter: true,
         args: scraperConfig.args,
+        timeout: scraperConfig.timeout,
       };
 
       return () => scrape(options, user.credentials);

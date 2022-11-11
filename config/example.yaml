@@ -28,5 +28,6 @@ scraper:
     - '--disable-audio-output'
     - '--headless'
     - '--single-process'
-
+  parallel: true
+  timeout: 60000
 
