@@ -11,14 +11,9 @@ function toUserOptions(creditCard, index) {
   return { type: creditCard.type, credentials: creditCard.credentials, parentBankIndex: index, name: creditCard.name };
 }
 
-function getParentBankAccountNumber(scrappedAccounts, currentAccount) {
-  // TODO support multi accounts
-  return scrappedAccounts[currentAccount.parentBankIndex].accounts[0].accountNumber;
-}
-
-function enrichAccount(accounts, currentAccount, scrappedAccounts) {
+function enrichAccount(accounts, currentAccount) {
   const accountDetails = currentAccount.parentBankIndex !== undefined ?
-    { type: currentAccount.type, parentBankAccountNumber: getParentBankAccountNumber(scrappedAccounts, currentAccount), kind: 'credit-card' } :
+    { type: currentAccount.type, kind: 'credit-card' } :
     { type: currentAccount.type, kind: 'bank' };
   return accounts.map(x => ({ ...x, accountDetails }));
 }
@@ -40,7 +35,7 @@ export function getFlatUsers(useOnlyAccounts, state, since) {
 }
 
 export function parseScrapResult(results, flatUsers) {
-  return results.reduce((m, x, i) => ([...m, ...(enrichAccount(x.accounts || [], flatUsers[i], results))]), []);
+  return results.reduce((m, x, i) => ([...m, ...(enrichAccount(x.accounts || [], flatUsers[i]))]), []);
 }
 
 export function getSuccessfulScrappedUsers(results, flatUsers) {
