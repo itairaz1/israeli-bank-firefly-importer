@@ -4,7 +4,7 @@ This project is in early stage! Please feel free to share your ideas and thought
 Using [Israeli bank scrapper](https://github.com/eshaham/israeli-bank-scrapers) and import the data into free and open source [FireFly iii](https://www.firefly-iii.org/).
 
 ## Features
-1. Import all the transactions from your bank and credit-cards accounts into firefly iii.
+1. Import all the transactions from your israeli bank site and israeli credit-cards sites into firefly iii.
 2. Every run import only the missing transactions.
 3. Locate credit-card end-of-period transactions in your bank account, and change it to transfer transaction to the correct credit-card inorder to keep credit-card balance correct.
 4. Optionally periodically running using CRON. 
@@ -14,7 +14,7 @@ Using [Israeli bank scrapper](https://github.com/eshaham/israeli-bank-scrapers) 
 1. [Firefly iii](https://www.firefly-iii.org/) is required in order to import data into - [getting started](https://github.com/firefly-iii/firefly-iii#getting-started).
 2. Your accounts are [currently supported](#supported-accounts).
 ### Steps (Quick start)
-1. `npm install -g israeli-bank-firefly-importer`
+1. Run `npm install -g israeli-bank-firefly-importer`
 2. Create API Token in firefly iii By going into 
    1. Firefly iii user interface
    2. Click on 'Options' on the left
@@ -30,12 +30,12 @@ Using [Israeli bank scrapper](https://github.com/eshaham/israeli-bank-scrapers) 
 If you want to let `israeli-bank-firefly-importer` running recurrently, you can set [cron expression](https://crontab.guru/) in `CRON` environment variable 
 
 ## Supported accounts
-Supported and tested accounts
+### Supported and tested accounts
 1. Leumi
 2. Isracard
 3. Cal
-
-Supported by [Israeli bank scrapper](https://github.com/eshaham/israeli-bank-scrapers) but not yet tested (Feel free to report an [issue](https://github.com/itairaz1/israeli-bank-firefly-importer/issues/new)): [Support list](https://github.com/eshaham/israeli-bank-scrapers#whats-here)
+### Supported by [Israeli bank scrapper](https://github.com/eshaham/israeli-bank-scrapers) but not yet tested ([Report an issue](https://github.com/itairaz1/israeli-bank-firefly-importer/issues/new))
+[Support list](https://github.com/eshaham/israeli-bank-scrapers#whats-here)
 
 ## Missing features and known issues:
 1. Support all banks and credit cards
