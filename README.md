@@ -15,7 +15,7 @@ Using [Israeli bank scrapper](https://github.com/eshaham/israeli-bank-scrapers) 
 2. Your accounts are [currently supported](#supported-accounts).
 
 ### Steps (Quick start)
-1. Run `npm install -g israeli-bank-firefly-importer`
+1. Run `npm install -g israeli-bank-firefly-importer`.
 2. Create API Token in firefly iii by - 
    1. Go to your hosted Firefly iii user interface.
    2. Click on 'Options' on the left.
@@ -28,7 +28,7 @@ Using [Israeli bank scrapper](https://github.com/eshaham/israeli-bank-scrapers) 
 4. Start by running `israeli-bank-firefly-importer` in your terminal.
 
 ## Schedule
-If you want to let `israeli-bank-firefly-importer` running recurrently, you can set [cron expression](https://crontab.guru/) in `CRON` environment variable 
+If you want to let `israeli-bank-firefly-importer` running recurrently, you can set [cron expression](https://crontab.guru/) in `CRON` environment variable. 
 
 ## Supported accounts
 ### Supported and tested accounts
@@ -39,14 +39,14 @@ If you want to let `israeli-bank-firefly-importer` running recurrently, you can 
 ### Supported by [Israeli bank scrapper](https://github.com/eshaham/israeli-bank-scrapers) but not yet tested ([Report an issue](https://github.com/itairaz1/israeli-bank-firefly-importer/issues/new))
 [Support list](https://github.com/eshaham/israeli-bank-scrapers#whats-here)
 
-## Missing features and known issues:
-1. Support all banks and credit cards
-2. Code quality: Add tests, error handling, organize code, normal logger and more
+## Missing features and known issues
+1. Support all banks and credit cards.
+2. Code quality: Add tests, error handling, organize code, normal logger and more.
 3. Add tools like linter github actions and more...
-4. Consider use typescript
-5. Support changing config after first run
-6. Support multi banks
-7. Make it more CLI friendly
+4. Consider use typescript.
+5. Support changing config after first run.
+6. Support multi banks.
+7. Make it more CLI friendly.
 
 ## License
 [MIT License](LICENSE)
