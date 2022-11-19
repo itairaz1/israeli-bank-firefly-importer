@@ -13,18 +13,19 @@ Using [Israeli bank scrapper](https://github.com/eshaham/israeli-bank-scrapers) 
 ### Prerequisite
 1. [Firefly iii](https://www.firefly-iii.org/) is required in order to import data into - [getting started](https://github.com/firefly-iii/firefly-iii#getting-started).
 2. Your accounts are [currently supported](#supported-accounts).
+
 ### Steps (Quick start)
 1. Run `npm install -g israeli-bank-firefly-importer`
-2. Create API Token in firefly iii By going into 
-   1. Firefly iii user interface
-   2. Click on 'Options' on the left
-   3. Click on 'Profile' in the sub menu
-   4. Click on 'OAuth' tab
-   5. Under 'Personal Access Tokens' click on 'Create new token'
-   6. Give a name and click create
-   7. Keep the token for later stage
+2. Create API Token in firefly iii by - 
+   1. Go to your hosted Firefly iii user interface.
+   2. Click on 'Options' on the left.
+   3. Click on 'Profile' in the sub menu.
+   4. Click on 'OAuth' tab.
+   5. Under 'Personal Access Tokens' click on 'Create new token'.
+   6. Give a name and click create.
+   7. Keep the token for later stage.
 3. Config: TODO (Currently, please check example).
-4. Start by running `israeli-bank-firefly-importer` in your terminal
+4. Start by running `israeli-bank-firefly-importer` in your terminal.
 
 ## Schedule
 If you want to let `israeli-bank-firefly-importer` running recurrently, you can set [cron expression](https://crontab.guru/) in `CRON` environment variable 
@@ -34,6 +35,7 @@ If you want to let `israeli-bank-firefly-importer` running recurrently, you can 
 1. Leumi
 2. Isracard
 3. Cal
+
 ### Supported by [Israeli bank scrapper](https://github.com/eshaham/israeli-bank-scrapers) but not yet tested ([Report an issue](https://github.com/itairaz1/israeli-bank-firefly-importer/issues/new))
 [Support list](https://github.com/eshaham/israeli-bank-scrapers#whats-here)
 
