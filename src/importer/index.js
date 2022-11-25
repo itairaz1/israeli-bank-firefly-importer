@@ -1,17 +1,24 @@
 import hash from 'object-hash';
-import { manipulateTxs } from './credit-cards.js';
-import { createAccount, upsertConfig, createTx, deleteTx, getAccounts, getAllTxs, getConfig, searchTxs, updateTx } from './../firefly.js';
-import { getFlatUsers, getScrappedAccounts, getSuccessfulScrappedUsers, logErrorResult, parseScrapResult } from './scrapper.js';
 import config from 'config';
 import moment from 'moment';
-import logger from './../logger.js';
+import manipulateTxs from './credit-cards.js';
+import {
+  createAccount,
+  upsertConfig,
+  createTx, deleteTx,
+  getAccounts, getAllTxs, getConfig, searchTxs, updateTx,
+} from '../firefly.js';
+import {
+  getFlatUsers, getScrappedAccounts, getSuccessfulScrappedUsers, logErrorResult, parseScrapResult,
+} from './scrapper.js';
+import logger from '../logger.js';
 import { getStateWithLastImport } from './last-import-helper.js';
 
-export async function doImport(options) {
-  const skipEdit = options.skipEdit;
-  const onlyAccounts = options.onlyAccounts;
-  const cleanup = options.cleanup;
-  const since = options.since;
+export default async function doImport(options) {
+  const { skipEdit } = options;
+  const { onlyAccounts } = options;
+  const { cleanup } = options;
+  const { since } = options;
 
   if (cleanup) {
     await drop();
@@ -32,10 +39,11 @@ export async function doImport(options) {
   const accountsMaps = await createAndMapAccounts(accounts);
 
   const fireTxs = accounts
-    .reduce((m, a) => ([...m, ...a.txns.map(tx => ({ ...tx, account: accountsMaps[a.accountNumber] }))]), [])
-    .filter(x => x.status === 'completed')
-    .filter(x => x.chargedAmount)
-    .map(x => ({
+    .reduce((m, a) => ([...m, ...a.txns
+      .map((tx) => ({ ...tx, account: accountsMaps[a.accountNumber] }))]), [])
+    .filter((x) => x.status === 'completed')
+    .filter((x) => x.chargedAmount)
+    .map((x) => ({
       type: x.chargedAmount > 0 ? 'deposit' : 'withdrawal',
       date: x.date,
       amount: Math.abs(x.chargedAmount),
@@ -54,24 +62,29 @@ export async function doImport(options) {
 
   logger.info('Getting map...');
   const minimalDate = fireTxs
-    .map(x => moment(x.date))
-    .reduce((m, x) => x.isBefore(m) ? x : m, moment());
+    .map((x) => moment(x.date))
+    .reduce((m, x) => (x.isBefore(m) ? x : m), moment());
   const getTxSince = moment(minimalDate).subtract(1, 'day');
   const workingTxs = await searchTxs({ date_after: getTxSince.format('YYYY-MM-DD') });
   const currentTxMap = await getExistsTxMap(workingTxs);
 
-  const toCreate = preparedFireTxs.filter(x => !currentTxMap[x.external_id]);
+  const toCreate = preparedFireTxs.filter((x) => !currentTxMap[x.external_id]);
   logger.info({ count: toCreate.length }, 'Creating transactions to firefly...');
-  await toCreate.reduce((p, x, i) => p.then(() => innerCreateTx(x, i + 1)), Promise.resolve());
+  await toCreate.reduce((p, x, i) => p
+    .then(() => innerCreateTx(x, i + 1)), Promise.resolve());
 
-  const toTypeUpdate = preparedFireTxs.filter(x => currentTxMap[x.external_id] && currentTxMap[x.external_id].type !== x.type);
+  const toTypeUpdate = preparedFireTxs
+    .filter((x) => currentTxMap[x.external_id] && currentTxMap[x.external_id].type !== x.type);
   logger.info({ count: toTypeUpdate.length }, 'Updating transactions types to firefly...');
-  await toTypeUpdate.reduce((p, x, i) => p.then(() => innerUpdateTx(currentTxMap[x.external_id], x, i + 1)), Promise.resolve());
+  await toTypeUpdate.reduce((p, x, i) => p
+    .then(() => innerUpdateTx(currentTxMap[x.external_id], x, i + 1)), Promise.resolve());
 
   if (!skipEdit) {
-    const toUpdate = preparedFireTxs.filter(x => currentTxMap[x.external_id] && currentTxMap[x.external_id].type === x.type);
+    const toUpdate = preparedFireTxs
+      .filter((x) => currentTxMap[x.external_id] && currentTxMap[x.external_id].type === x.type);
     logger.info({ count: toUpdate.length }, 'Updating transactions to firefly...');
-    await toUpdate.reduce((p, x, i) => p.then(() => innerUpdateTx(currentTxMap[x.external_id], x, i + 1)), Promise.resolve());
+    await toUpdate.reduce((p, x, i) => p
+      .then(() => innerUpdateTx(currentTxMap[x.external_id], x, i + 1)), Promise.resolve());
   }
 
   logger.info('Updating last import...');
@@ -84,20 +97,20 @@ export async function doImport(options) {
 
 async function getExistsTxMap(fireFlyData) {
   return fireFlyData
-    .map(x => ({
+    .map((x) => ({
       type: x.attributes.transactions[0].type,
       ext_id: x.attributes.transactions[0].external_id,
       id: x.id,
     }))
-    .reduce((m, { id, ext_id, type }) => ({ ...m, [ext_id]: { id, type } }), {});
+    .reduce((m, { id, ext_id: extId, type }) => ({ ...m, [extId]: { id, type } }), {});
 }
 
 function calcMonthlyPaymentDate(account) {
   const sumMap = account.txns
-    .map(x => moment(x.processedDate).date())
+    .map((x) => moment(x.processedDate).date())
     .reduce((m, x) => ({ ...m, [x]: (m[x] || 0) + 1 }), {});
 
-  const topDate = Object.keys(sumMap).reduce((m, x) => m && sumMap[m] > sumMap[x] ? m : x, 0);
+  const topDate = Object.keys(sumMap).reduce((m, x) => (m && sumMap[m] > sumMap[x] ? m : x), 0);
 
   return moment().set('date', topDate).format('YYYY-MM-DD');
 }
@@ -107,24 +120,34 @@ async function createAndMapAccounts(scrapperAccounts) {
 
   const rawAccounts = await getAccounts();
   const accountsMap = rawAccounts.data.data
-    .filter(x => x.attributes.account_number && map[x.attributes.account_number])
-    .map(x => ({ id: x.id, accountNumber: x.attributes.account_number }))
-    .reduce((m, x) => ({ ...m, [x.accountNumber]: { ...map[x.accountNumber].accountDetails, id: x.id } }), {});
+    .filter((x) => x.attributes.account_number && map[x.attributes.account_number])
+    .map((x) => ({ id: x.id, accountNumber: x.attributes.account_number }))
+    .reduce((m, x) => ({
+      ...m,
+      [x.accountNumber]: {
+        ...map[x.accountNumber].accountDetails,
+        id: x.id,
+      },
+    }), {});
   const missedAccounts = scrapperAccounts
-    .map(x => x.accountNumber)
-    .filter(x => !accountsMap[x]);
+    .map((x) => x.accountNumber)
+    .filter((x) => !accountsMap[x]);
 
-  const results = await missedAccounts.reduce((m, a) => m.then(async x => [...x, await createAccount({
-    name: a,
-    account_number: a,
-    type: 'asset',
-    account_role: map[a].accountDetails.kind === 'bank' ? 'defaultAsset' : 'ccAsset',
-    ...(map[a].accountDetails.kind !== 'bank' ? { credit_card_type: 'monthlyFull', monthly_payment_date: calcMonthlyPaymentDate(map[a]) } : {}),
-  })]), Promise.resolve([]));
+  const results = await missedAccounts
+    .reduce((m, a) => m.then(async (x) => [...x, await createAccount({
+      name: a,
+      account_number: a,
+      type: 'asset',
+      account_role: map[a].accountDetails.kind === 'bank' ? 'defaultAsset' : 'ccAsset',
+      ...(map[a].accountDetails.kind !== 'bank' ? { credit_card_type: 'monthlyFull', monthly_payment_date: calcMonthlyPaymentDate(map[a]) } : {}),
+    })]), Promise.resolve([]));
 
   return results.reduce((m, x) => ({
     ...m,
-    [x.data.data.attributes.account_number]: { ...map[x.data.data.attributes.account_number].accountDetails, id: x.data.data.id },
+    [x.data.data.attributes.account_number]: {
+      ...map[x.data.data.attributes.account_number].accountDetails,
+      id: x.data.data.id,
+    },
   }), accountsMap);
 }
 
@@ -132,7 +155,7 @@ async function drop() {
   logger.info('Getting data for drop');
   const fireFlyData = await getAllTxs();
   const toDrop = fireFlyData
-    .map(x => ({ id: x.id, ...x.attributes.transactions[0] }));
+    .map((x) => ({ id: x.id, ...x.attributes.transactions[0] }));
 
   logger.info({
     count: toDrop.length,
@@ -140,13 +163,13 @@ async function drop() {
   }, 'Dropping transactions');
 
   let count = 1;
-  for (let tx of toDrop) {
+  await toDrop.reduce((p, tx) => p.then(async () => {
     await deleteTx(tx.id);
-    count++;
+    count += 1;
     if (count % 50 === 0) {
       logger.info({ currentAmount: count }, 'Transactions deleted');
     }
-  }
+  }, Promise.resolve()));
 }
 
 async function innerCreateTx(tx, count) {
@@ -171,15 +194,14 @@ async function innerUpdateTx({ id, type }, tx, count) {
     if (count % 50 === 0) {
       logger.info({ currentAmount: count }, 'Transactions updated.');
     }
-
   } catch (e) {
     logger.error({ error: e, tx }, 'Error updating transaction');
   }
 }
 
 const getters = {
-  hash: x => hash(omitAccount(x)),
-  identifier: x => x.identifier,
+  hash: (x) => hash(omitAccount(x)),
+  identifier: (x) => x.identifier,
 };
 
 function omitAccount(tx) {

@@ -1,19 +1,19 @@
 import moment from 'moment';
 
 const identifyAccountByType = {
-  leumi: c => c.username,
-  visaCal: c => c.username,
-  beinleumi: c => c.username,
-  mizrahi: c => c.username,
-  massad: c => c.username,
-  max: c => c.username,
-  amex: c => c.username,
-  yahav: c => c.username,
-  'otsar-hahayal': c => c.username,
-  isracard: c => c.id,
-  discount: c => c.id,
-  'beyahad-bishvilha': c => c.id,
-  hapoalim: c => c.userCode,
+  leumi: (c) => c.username,
+  visaCal: (c) => c.username,
+  beinleumi: (c) => c.username,
+  mizrahi: (c) => c.username,
+  massad: (c) => c.username,
+  max: (c) => c.username,
+  amex: (c) => c.username,
+  yahav: (c) => c.username,
+  'otsar-hahayal': (c) => c.username,
+  isracard: (c) => c.id,
+  discount: (c) => c.id,
+  'beyahad-bishvilha': (c) => c.id,
+  hapoalim: (c) => c.userCode,
 };
 
 function getAccountIdentification(user) {
@@ -42,6 +42,9 @@ export function getLastImport(account, state, since) {
 export function getStateWithLastImport(users, state) {
   const now = moment().toISOString();
   const lastState = typeof state.lastImport === 'string' ? {} : state.lastImport;
-  const newLastImport = users.reduce((m, u) => ({ ...m, [getAccountIdentification(u)]: now }), lastState);
+  const newLastImport = users.reduce((m, u) => ({
+    ...m,
+    [getAccountIdentification(u)]: now,
+  }), lastState);
   return { ...state, lastImport: newLastImport };
 }

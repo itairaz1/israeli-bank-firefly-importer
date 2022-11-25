@@ -1,12 +1,14 @@
 {
   "name": "israeli-bank-firefly-importer",
   "version": "0.4.2",
-  "description": "",
-  "main": "index.js",
+  "description": "Using Israeli bank scrapper and import the data into free and open source FireFly iii.",
+  "main": "src/index.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "prepare": "husky install",
+    "lint": "eslint src --fix"
   },
   "bin": {
     "@itair86/israeli-bank-firefly-importer": "src/index.js",
@@ -18,6 +20,7 @@
   "dependencies": {
     "axios": "^0.27.2",
     "config": "^3.3.8",
+    "husky": "^8.0.2",
     "israeli-bank-scrapers": "^3.1.2",
     "js-yaml": "^4.1.0",
     "moment": "^2.29.4",
@@ -25,5 +28,14 @@
     "object-hash": "^3.0.0",
     "pino": "^8.7.0",
     "pino-pretty": "^9.1.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.28.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-jsx-a11y": "^6.6.1",
+    "eslint-plugin-react": "^7.31.11",
+    "eslint-plugin-react-hooks": "^4.6.0"
   }
 }

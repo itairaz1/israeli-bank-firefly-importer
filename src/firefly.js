@@ -1,9 +1,10 @@
+/* eslint-disable no-await-in-loop */
 import config from 'config';
 import axios from 'axios';
 import logger from './logger.js';
 
 const fireflyConfig = config.firefly;
-let fireflyAxios = new axios.create({ headers: getHeader(), baseURL: fireflyConfig.baseUrl });
+const fireflyAxios = axios.create({ headers: getHeader(), baseURL: fireflyConfig.baseUrl });
 
 export async function searchTxs(options) {
   const query = Object.keys(options).reduce((m, x) => `${m} ${x}:${options[x]}`, '').trim();
@@ -11,7 +12,7 @@ export async function searchTxs(options) {
   let totalPages = 1;
   const fireFlyData = [];
   while (page <= totalPages) {
-    const res = await fireflyAxios.get(`/api/v1/search/transactions`, {
+    const res = await fireflyAxios.get('/api/v1/search/transactions', {
       params: { query, page },
     });
 
@@ -22,15 +23,14 @@ export async function searchTxs(options) {
 
     fireFlyData.push(...res.data.data);
     totalPages = res.data.meta.pagination.total_pages;
-    page++;
+    page += 1;
   }
 
   return fireFlyData;
-
 }
 
 export async function getAllTxs() {
-  let nextPage = `/api/v1/transactions`;
+  let nextPage = '/api/v1/transactions';
   const fireFlyData = [];
   while (nextPage) {
     const res = await fireflyAxios.get(nextPage);
@@ -73,7 +73,7 @@ export async function getTxsByTag(tag) {
 }
 
 export function createTx(transactions) {
-  return fireflyAxios.post(`/api/v1/transactions`, { transactions });
+  return fireflyAxios.post('/api/v1/transactions', { transactions });
 }
 
 export function updateTx(id, transactions) {
@@ -85,21 +85,21 @@ export function deleteTx(id) {
 }
 
 export function getAccounts() {
-  return fireflyAxios.get(`/api/v1/accounts`);
+  return fireflyAxios.get('/api/v1/accounts');
 }
 
 export function createAccount(data) {
-  return fireflyAxios.post(`/api/v1/accounts`, data);
+  return fireflyAxios.post('/api/v1/accounts', data);
 }
 
 export function upsertConfig(state) {
-  return fireflyAxios.post(`/api/v1/preferences`, { name: 'israeli-bank-importer', data: state });
+  return fireflyAxios.post('/api/v1/preferences', { name: 'israeli-bank-importer', data: state });
 }
 
 export function getConfig() {
-  return fireflyAxios.get(`/api/v1/preferences/israeli-bank-importer`);
+  return fireflyAxios.get('/api/v1/preferences/israeli-bank-importer');
 }
 
 function getHeader() {
-  return { 'Authorization': `Bearer ${fireflyConfig.tokenApi}` };
+  return { Authorization: `Bearer ${fireflyConfig.tokenApi}` };
 }

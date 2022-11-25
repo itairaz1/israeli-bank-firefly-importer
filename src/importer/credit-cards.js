@@ -1,35 +1,51 @@
 import moment from 'moment';
 import config from 'config';
-import { getTxsByTag } from './../firefly.js';
+import { getTxsByTag } from '../firefly.js';
 
 const creditCardDescConfig = config.creditCardDesc;
 
-export function manipulateTxs(txs, accountsMap) {
+export default function manipulateTxs(txs, accountsMap) {
   const ccDesc = getCcDesc(accountsMap);
-  return txs.reduce((m, tx) => m.then(async x => [...x, await manipulateTx(tx, ccDesc, accountsMap)]), Promise.resolve([]));
+  return txs.reduce(
+    (m, tx) => m.then(async (x) => [...x, await manipulateTx(tx, ccDesc, accountsMap)]),
+    Promise.resolve([]),
+  );
 }
 
 async function manipulateTx(tx, ccDesc, accountsMap) {
   let newTx = tx;
-  newTx = { ...newTx, tags: ccTag(tx, accountsMap) };
+  newTx = {
+    ...newTx,
+    tags: ccTag(tx, accountsMap),
+  };
   newTx = await ccTransfer(newTx, ccDesc, accountsMap);
   return newTx;
 }
 
 function getCcDesc(accountsMap) {
   const typeToIds = Object.values(accountsMap)
-    .filter(x => x.kind === 'credit-card')
-    .map(x => ({ type: x.type, id: x.id }))
+    .filter((x) => x.kind === 'credit-card')
+    .map((x) => ({
+      type: x.type,
+      id: x.id,
+    }))
     .reduce((m, x) => ({
       ...m,
       [x.type]: [...(m[x.type] || []), x.id],
     }), {});
 
-  return creditCardDescConfig.reduce((m, x) => ({ ...m, [x.desc]: { ids: typeToIds[x.creditCard], method: x.method || 'process-date' } }), {});
+  return creditCardDescConfig.reduce((m, x) => ({
+    ...m,
+    [x.desc]: {
+      ids: typeToIds[x.creditCard],
+      method: x.method || 'process-date',
+    },
+  }), {});
 }
 
 function ccTag(tx, accountsMap) {
-  const isCc = Object.values(accountsMap).some(x => x.kind === 'credit-card' && (x.id === tx.source_id || x.id === tx.destination_id));
+  const isCc = Object.values(accountsMap)
+    .some((x) => x.kind === 'credit-card' && (x.id === tx.source_id || x.id === tx.destination_id));
   if (!isCc) {
     return null;
   }
@@ -40,7 +56,7 @@ function ccTag(tx, accountsMap) {
 
 const methods = {
   'process-date': processByProcessDate,
-  'reference': processByReference,
+  reference: processByReference,
 };
 
 async function processByReference(tx, ccAccountsIds, accountsMap) {
@@ -60,7 +76,7 @@ async function processByProcessDate(tx, ccAccountsIds) {
 
     index = 0;
   } else {
-    const amountsByIndex = await Promise.all(ccAccountsIds.map(x => getTxAmount(processDate, x)));
+    const amountsByIndex = await Promise.all(ccAccountsIds.map((x) => getTxAmount(processDate, x)));
     const nonAbsAmount = (tx.type === 'deposit' ? 1 : -1) * tx.amount;
     index = amountsByIndex.indexOf(nonAbsAmount);
     if (index === -1) {
@@ -96,10 +112,12 @@ async function ccTransfer(tx, ccDesc, accountsMap) {
 async function getTxAmount(processDate, accountId) {
   let res = await getTxsByTag(`${accountId}_${processDate}`);
   if (res.length === 0) {
-    const yd = moment(processDate).subtract(1, 'day').toISOString();
+    const yd = moment(processDate)
+      .subtract(1, 'day')
+      .toISOString();
     res = await getTxsByTag(`${accountId}_${yd}`);
   }
-  const txs = res.map(x => x.attributes.transactions[0]);
+  const txs = res.map((x) => x.attributes.transactions[0]);
   const sum = txs.reduce((m, x) => (x.type === 'deposit' ? 1 : -1) * x.amount + m, 0);
   return Math.round(sum * 100) / 100;
 }
