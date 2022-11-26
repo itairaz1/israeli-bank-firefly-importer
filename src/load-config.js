@@ -1,14 +1,24 @@
 import config from 'config';
-import { delimiter, dirname, resolve } from 'path';
-import { fileURLToPath } from 'url';
+import { promises as fs } from 'fs';
+import yaml from 'js-yaml';
+import logger from './logger.js';
 
-const filename = fileURLToPath(import.meta.url);
-const dirName = dirname(filename);
-const configDir = resolve(dirName, '../config');
+async function readConfigFile(path) {
+  try {
+    return await fs.readFile(path, 'utf8');
+  } catch (err) {
+    if (err.code === 'ENOENT') {
+      throw new Error(`Config file ${path} not found`);
+    }
+    throw err;
+  }
+}
 
-const configFromEnvVarAsArray = process.env.IBFI_CONFIG_PATH ? [process.env.IBFI_CONFIG_PATH] : [];
-const resolvedConfigDirs = [...configFromEnvVarAsArray, configDir].join(delimiter);
-config.util.extendDeep(config, config.util.loadFileConfigs(resolvedConfigDirs));
-
-const { default: logger } = await import('./logger.js');
-logger.debug({ path: resolvedConfigDirs }, 'Config loaded');
+export default async function loadConfig(path) {
+  logger().debug(`Trying to load config file '${path}'...`);
+  const configContent = await readConfigFile(path);
+  // TODO: add schema
+  const fileData = yaml.load(configContent, { filename: path });
+  config.util.extendDeep(config, fileData);
+  logger().debug(`Config file '${path}' loaded.`);
+}

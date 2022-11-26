@@ -1,10 +1,20 @@
 import pino from 'pino';
 import config from 'config';
 
-const { log: logConfig } = config;
+let pinoInstance;
 
-const transport = logConfig.prettyPrint ? {
-  target: 'pino-pretty',
-} : {};
+export function init() {
+  pinoInstance = pino({
+    level: config.log.level,
+    transport: config.log.prettyPrint ? {
+      target: 'pino-pretty',
+    } : {},
+  });
+}
 
-export default pino({ level: logConfig.level, transport });
+export default function getPino() {
+  return pinoInstance;
+}
+
+// Init with default before load config
+init();

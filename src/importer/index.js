@@ -24,18 +24,18 @@ export default async function doImport(options) {
     await drop();
   }
 
-  logger.info('Getting state from firefly...');
+  logger().info('Getting state from firefly...');
   const axiosState = await getConfig();
   const state = JSON.parse(axiosState.data.data.attributes.data);
   const lastImportState = state.lastImport;
 
-  logger.info('Getting scrap data...');
+  logger().info('Getting scrap data...');
   const flatUsers = getFlatUsers(onlyAccounts, lastImportState, since);
   const scrapResult = await getScrappedAccounts(flatUsers);
   logErrorResult(scrapResult, flatUsers);
   const accounts = parseScrapResult(scrapResult, flatUsers);
 
-  logger.info('Getting or creating accounts...');
+  logger().info('Getting or creating accounts...');
   const accountsMaps = await createAndMapAccounts(accounts);
 
   const fireTxs = accounts
@@ -57,10 +57,10 @@ export default async function doImport(options) {
       process_date: x.processedDate,
     }));
 
-  logger.info('Manipulating...');
+  logger().info('Manipulating...');
   const preparedFireTxs = await manipulateTxs(fireTxs, accountsMaps);
 
-  logger.info('Getting map...');
+  logger().info('Getting map...');
   const minimalDate = fireTxs
     .map((x) => moment(x.date))
     .reduce((m, x) => (x.isBefore(m) ? x : m), moment());
@@ -69,30 +69,30 @@ export default async function doImport(options) {
   const currentTxMap = await getExistsTxMap(workingTxs);
 
   const toCreate = preparedFireTxs.filter((x) => !currentTxMap[x.external_id]);
-  logger.info({ count: toCreate.length }, 'Creating transactions to firefly...');
+  logger().info({ count: toCreate.length }, 'Creating transactions to firefly...');
   await toCreate.reduce((p, x, i) => p
     .then(() => innerCreateTx(x, i + 1)), Promise.resolve());
 
   const toTypeUpdate = preparedFireTxs
     .filter((x) => currentTxMap[x.external_id] && currentTxMap[x.external_id].type !== x.type);
-  logger.info({ count: toTypeUpdate.length }, 'Updating transactions types to firefly...');
+  logger().info({ count: toTypeUpdate.length }, 'Updating transactions types to firefly...');
   await toTypeUpdate.reduce((p, x, i) => p
     .then(() => innerUpdateTx(currentTxMap[x.external_id], x, i + 1)), Promise.resolve());
 
   if (!skipEdit) {
     const toUpdate = preparedFireTxs
       .filter((x) => currentTxMap[x.external_id] && currentTxMap[x.external_id].type === x.type);
-    logger.info({ count: toUpdate.length }, 'Updating transactions to firefly...');
+    logger().info({ count: toUpdate.length }, 'Updating transactions to firefly...');
     await toUpdate.reduce((p, x, i) => p
       .then(() => innerUpdateTx(currentTxMap[x.external_id], x, i + 1)), Promise.resolve());
   }
 
-  logger.info('Updating last import...');
+  logger().info('Updating last import...');
   const scrappedUsers = getSuccessfulScrappedUsers(scrapResult, flatUsers);
   const updatedState = getStateWithLastImport(scrappedUsers, state);
   await upsertConfig(JSON.stringify(updatedState));
 
-  logger.info('Done.');
+  logger().info('Done.');
 }
 
 async function getExistsTxMap(fireFlyData) {
@@ -152,12 +152,12 @@ async function createAndMapAccounts(scrapperAccounts) {
 }
 
 async function drop() {
-  logger.info('Getting data for drop');
+  logger().info('Getting data for drop');
   const fireFlyData = await getAllTxs();
   const toDrop = fireFlyData
     .map((x) => ({ id: x.id, ...x.attributes.transactions[0] }));
 
-  logger.info({
+  logger().info({
     count: toDrop.length,
     total: fireFlyData.length,
   }, 'Dropping transactions');
@@ -167,7 +167,7 @@ async function drop() {
     await deleteTx(tx.id);
     count += 1;
     if (count % 50 === 0) {
-      logger.info({ currentAmount: count }, 'Transactions deleted');
+      logger().info({ currentAmount: count }, 'Transactions deleted');
     }
   }, Promise.resolve()));
 }
@@ -176,10 +176,10 @@ async function innerCreateTx(tx, count) {
   try {
     await createTx([tx]);
     if (count % 50 === 0) {
-      logger.info({ currentAmount: count }, 'Transactions created.');
+      logger().info({ currentAmount: count }, 'Transactions created.');
     }
   } catch (e) {
-    logger.error({ error: e, tx }, 'Error creating transaction');
+    logger().error({ error: e, tx }, 'Error creating transaction');
   }
 }
 
@@ -192,10 +192,10 @@ async function innerUpdateTx({ id, type }, tx, count) {
       await updateTx(id, [tx]);
     }
     if (count % 50 === 0) {
-      logger.info({ currentAmount: count }, 'Transactions updated.');
+      logger().info({ currentAmount: count }, 'Transactions updated.');
     }
   } catch (e) {
-    logger.error({ error: e, tx }, 'Error updating transaction');
+    logger().error({ error: e, tx }, 'Error updating transaction');
   }
 }
 

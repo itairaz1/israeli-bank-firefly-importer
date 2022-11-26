@@ -24,7 +24,12 @@ Using [Israeli bank scrapper](https://github.com/eshaham/israeli-bank-scrapers) 
    5. Under 'Personal Access Tokens' click on 'Create new token'.
    6. Give a name and click create.
    7. Keep the token for later stage.
-3. Config: TODO (Currently, please check example).
+3. Copy [config template](config/basic.template.config.yaml) to working directory, change the name to `config.yaml` and edit it based on the comments
+   ```shell
+   wget https://raw.githubusercontent.com/itairaz1/israeli-bank-firefly-importer/main/config/basic.template.config.yaml
+   mv basic.template.config.yaml config.yaml
+   vi config.yaml
+   ```
 4. Start by running `israeli-bank-firefly-importer` in your terminal.
 
 ## Schedule

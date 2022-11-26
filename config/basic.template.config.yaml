@@ -1,0 +1,28 @@
+# Firefly iii config (Mandatory)
+firefly:
+  # URL of Firefly iii
+  baseUrl: ''
+  # Token API can receive from: Options -> Profile -> OAuth -> Create new token (Personal Access Tokens) -> Type name -> Create
+  tokenApi: ''
+
+# Banks list (Currently support only one) config to scrap and import (Mandatory)
+banks:
+  # Type of the bank type (leumi, beinleumi, mizrahi, massad, yahav, 'otsar-hahayal', discount, 'beyahad-bishvilha', hapoalim)
+  - type: leumi
+  # Bank credential in the following format based of the bank type: https://github.com/eshaham/israeli-bank-scrapers#specific-definitions-per-scraper
+    credentials:
+      username: 'my-username'
+      password: 'my-password'
+    # Credit cards list that processed in the bank
+    creditCards:
+      # Type of the credit card type (isracard, visaCal, max, amex)
+      - type: isracard
+        # Credit card credential in the following format based of the credit card type: https://github.com/eshaham/israeli-bank-scrapers#specific-definitions-per-scraper
+        credentials:
+          id: '123456789'
+          card6Digits: '123456'
+          password: 'my-password'
+
+# Cron - If set, keep the app working and execute by crontab (Optional, default unset).
+#cron: '0 0 7 * * *' # Run every day at 7am
+

@@ -3,20 +3,31 @@ import config from 'config';
 import axios from 'axios';
 import logger from './logger.js';
 
-const fireflyConfig = config.firefly;
-const fireflyAxios = axios.create({ headers: getHeader(), baseURL: fireflyConfig.baseUrl });
+let fireflyAxios;
+
+export function init() {
+  fireflyAxios = axios.create({
+    headers: getHeader(),
+    baseURL: config.firefly.baseUrl,
+  });
+}
 
 export async function searchTxs(options) {
-  const query = Object.keys(options).reduce((m, x) => `${m} ${x}:${options[x]}`, '').trim();
+  const query = Object.keys(options)
+    .reduce((m, x) => `${m} ${x}:${options[x]}`, '')
+    .trim();
   let page = 1;
   let totalPages = 1;
   const fireFlyData = [];
   while (page <= totalPages) {
     const res = await fireflyAxios.get('/api/v1/search/transactions', {
-      params: { query, page },
+      params: {
+        query,
+        page,
+      },
     });
 
-    logger.info({
+    logger().info({
       currentPage: res.data.meta.pagination.current_page,
       totalPages: res.data.meta.pagination.total_pages,
     }, 'Transaction page fetched');
@@ -35,7 +46,7 @@ export async function getAllTxs() {
   while (nextPage) {
     const res = await fireflyAxios.get(nextPage);
 
-    logger.info({
+    logger().info({
       currentPage: res.data.meta.pagination.current_page,
       totalPages: res.data.meta.pagination.total_pages,
     }, 'Transaction page fetched');
@@ -93,7 +104,10 @@ export function createAccount(data) {
 }
 
 export function upsertConfig(state) {
-  return fireflyAxios.post('/api/v1/preferences', { name: 'israeli-bank-importer', data: state });
+  return fireflyAxios.post('/api/v1/preferences', {
+    name: 'israeli-bank-importer',
+    data: state,
+  });
 }
 
 export function getConfig() {
@@ -101,5 +115,5 @@ export function getConfig() {
 }
 
 function getHeader() {
-  return { Authorization: `Bearer ${fireflyConfig.tokenApi}` };
+  return { Authorization: `Bearer ${config.firefly.tokenApi}` };
 }
