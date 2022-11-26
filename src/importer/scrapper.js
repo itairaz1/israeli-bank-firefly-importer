@@ -93,6 +93,9 @@ export async function getScrappedAccounts(flatUsers) {
         showBrowser: false,
         args: scraperConfig.args,
         timeout: scraperConfig.timeout,
+        outputData: {
+          enableTransactionsFilterByDate: false,
+        },
       };
 
       return () => scrape(options, user.credentials);
