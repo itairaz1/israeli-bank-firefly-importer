@@ -23,6 +23,7 @@ export default async function loadConfig(path) {
       transform: (obj) => {
         // eslint-disable-next-line no-param-reassign
         obj.key = envMap[obj.key];
+        return obj;
       },
     })
     .file({
