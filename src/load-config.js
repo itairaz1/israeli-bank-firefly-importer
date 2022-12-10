@@ -21,6 +21,9 @@ export default async function loadConfig(path) {
     .remove('defaults')
     .env({
       transform: (obj) => {
+        if (!envMap[obj.key]) {
+          return null;
+        }
         // eslint-disable-next-line no-param-reassign
         obj.key = envMap[obj.key];
         return obj;
