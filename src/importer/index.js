@@ -1,5 +1,5 @@
 import hash from 'object-hash';
-import config from 'config';
+import config from 'nconf';
 import moment from 'moment';
 import manipulateTxs from './credit-cards.js';
 import {
@@ -210,7 +210,7 @@ function omitAccount(tx) {
 }
 
 function getExternalId(tx) {
-  const identifyMethod = config.identifyMethod[tx.account.type] || 'identifier';
+  const identifyMethod = config.get('identifyMethod')[tx.account.type] || 'identifier';
   const getter = getters[identifyMethod] || getters.identifier;
   return getter(tx);
 }

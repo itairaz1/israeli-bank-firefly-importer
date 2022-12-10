@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import config from 'config';
+import config from 'nconf';
 import { schedule } from 'node-cron';
 import loadConfig from './load-config.js';
 import doImport from './importer/index.js';
@@ -20,7 +20,10 @@ async function run() {
 }
 
 async function init() {
-  await loadConfig(process.env.CONFIG_FILE || './config.yaml');
+  const configFile = process.env.CONFIG_FILE || './config.yaml';
+  await loadConfig(configFile);
+  logger().debug(`Config file '${configFile}' loaded.`);
+
   loggerInit();
   fireFlyInit();
 }
@@ -28,9 +31,10 @@ async function init() {
 try {
   await init();
   await run();
-  if (config.cron) {
-    logger().info({ cron: config.cron }, 'Running with cron');
-    schedule(config.cron, run);
+  const cron = config.get('cron');
+  if (cron) {
+    logger().info({ cron }, 'Running with cron');
+    schedule(cron, run);
   }
 } catch (err) {
   logger().error(err);

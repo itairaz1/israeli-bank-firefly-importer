@@ -1,12 +1,12 @@
 import pino from 'pino';
-import config from 'config';
+import config from 'nconf';
 
 let pinoInstance;
 
 export function init() {
   pinoInstance = pino({
-    level: config.log.level,
-    transport: config.log.prettyPrint ? {
+    level: config.get('log:level'),
+    transport: config.get('log:prettyPrint') ? {
       target: 'pino-pretty',
     } : {},
   });

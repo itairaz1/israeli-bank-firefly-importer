@@ -1,5 +1,5 @@
 import moment from 'moment';
-import config from 'config';
+import config from 'nconf';
 import { getTxsByTag } from '../firefly.js';
 
 export default function manipulateTxs(txs, accountsMap) {
@@ -32,7 +32,7 @@ function getCcDesc(accountsMap) {
       [x.type]: [...(m[x.type] || []), x.id],
     }), {});
 
-  return config.creditCardDesc.reduce((m, x) => ({
+  return config.get('creditCardDesc').reduce((m, x) => ({
     ...m,
     [x.desc]: {
       ids: typeToIds[x.creditCard],

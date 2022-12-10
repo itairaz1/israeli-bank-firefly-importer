@@ -1,5 +1,5 @@
 /* eslint-disable no-await-in-loop */
-import config from 'config';
+import config from 'nconf';
 import axios from 'axios';
 import logger from './logger.js';
 
@@ -8,7 +8,7 @@ let fireflyAxios;
 export function init() {
   fireflyAxios = axios.create({
     headers: getHeader(),
-    baseURL: config.firefly.baseUrl,
+    baseURL: config.get('firefly:baseUrl'),
   });
 }
 
@@ -115,5 +115,5 @@ export function getConfig() {
 }
 
 function getHeader() {
-  return { Authorization: `Bearer ${config.firefly.tokenApi}` };
+  return { Authorization: `Bearer ${config.get('firefly:tokenApi')}` };
 }

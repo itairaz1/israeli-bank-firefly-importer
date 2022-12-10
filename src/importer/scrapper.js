@@ -1,5 +1,5 @@
 import { CompanyTypes, createScraper } from 'israeli-bank-scrapers';
-import config from 'config';
+import config from 'nconf';
 import moment from 'moment';
 import logger from '../logger.js';
 import { getLastImport } from './last-import-helper.js';
@@ -39,10 +39,10 @@ function getScrapFrom(account) {
 }
 
 export function getFlatUsers(useOnlyAccounts, state, since) {
-  if (!config.banks) {
+  if (!config.get('banks')) {
     throw new Error('No banks in config');
   }
-  return config.banks
+  return config.get('banks')
     .flatMap((bank, i) => ([toUserOptions(bank), ...(bank.creditCards || [])
       .map((cc) => toUserOptions(cc, i))]))
     .filter((x) => !useOnlyAccounts || useOnlyAccounts.includes(x.name))
@@ -83,7 +83,7 @@ export function logErrorResult(results, flatUsers) {
 }
 
 export async function getScrappedAccounts(flatUsers) {
-  const { scraper: scraperConfig } = config;
+  const scraperConfig = config.get('scraper');
   const actions = flatUsers
     .map((user) => {
       const options = {

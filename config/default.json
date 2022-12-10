@@ -1,0 +1,33 @@
+{
+  "identifyMethod": {
+    "isracard": "identifier",
+    "leumi": "hash",
+    "visaCal": "hash"
+  },
+  "creditCardDesc": [
+    {
+      "desc": "ל.מאסטרקרד(יש)",
+      "creditCard": "isracard"
+    },
+    {
+      "desc": "ישראכרט-י",
+      "creditCard": "isracard"
+    },
+    {
+      "desc": "ויזה כ.א.ל-י",
+      "creditCard": "visaCal"
+    },
+    {
+      "desc": "כרטיסי אשראי-י",
+      "creditCard": "visaCal"
+    }
+  ],
+  "scraper": {
+    "parallel": true,
+    "args": []
+  },
+  "log": {
+    "level": "info",
+    "prettyPrint": true
+  }
+}
