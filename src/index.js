@@ -15,16 +15,17 @@ async function run() {
       cleanup: false,
     });
   } catch (err) {
-    logger().error(err, 'Fatal error');
+    logger()
+      .error(err, 'Fatal error');
   }
 }
 
 async function init() {
   const configFile = process.env.CONFIG_FILE || './config.yaml';
   await loadConfig(configFile);
+  loggerInit();
   logger().debug(`Config file '${configFile}' loaded.`);
 
-  loggerInit();
   fireFlyInit();
 }
 
@@ -33,9 +34,11 @@ try {
   await run();
   const cron = config.get('cron');
   if (cron) {
-    logger().info({ cron }, 'Running with cron');
+    logger()
+      .info({ cron }, 'Running with cron');
     schedule(cron, run);
   }
 } catch (err) {
-  logger().error(err);
+  logger()
+    .error(err);
 }

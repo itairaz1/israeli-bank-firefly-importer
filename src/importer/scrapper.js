@@ -92,7 +92,7 @@ export async function getScrappedAccounts(flatUsers) {
         combineInstallments: false,
         showBrowser: false,
         args: scraperConfig.args,
-        timeout: scraperConfig.timeout,
+        defaultTimeout: scraperConfig.timeout,
         outputData: {
           enableTransactionsFilterByDate: false,
         },
