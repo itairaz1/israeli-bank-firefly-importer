@@ -60,7 +60,8 @@ export function getFlatUsers(useOnlyAccounts, state, since) {
 export function parseScrapResult(results, flatUsers) {
   return results
     .reduce((m, x, i) => ([...m, ...(enrichAccount(x.accounts || [], flatUsers[i]))]), [])
-    .map(manipulateScrapResult);
+    .map(manipulateScrapResult)
+    .filter((x) => x);
 }
 
 export function getSuccessfulScrappedUsers(results, flatUsers) {
