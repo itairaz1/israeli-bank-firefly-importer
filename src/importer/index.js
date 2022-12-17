@@ -9,7 +9,7 @@ import {
   getAccounts, getAllTxs, getConfig, searchTxs, updateTx,
 } from '../firefly.js';
 import {
-  getFlatUsers, getScrappedAccounts, getSuccessfulScrappedUsers, logErrorResult, parseScrapResult,
+  getFlatUsers, scrapAccounts, getSuccessfulScrappedUsers, logErrorResult, parseScrapResult,
 } from './scrapper.js';
 import logger from '../logger.js';
 import { getStateWithLastImport } from './last-import-helper.js';
@@ -31,7 +31,7 @@ export default async function doImport(options) {
 
   logger().info('Getting scrap data...');
   const flatUsers = getFlatUsers(onlyAccounts, lastImportState, since);
-  const scrapResult = await getScrappedAccounts(flatUsers);
+  const scrapResult = await scrapAccounts(flatUsers);
   logErrorResult(scrapResult, flatUsers);
   const accounts = parseScrapResult(scrapResult, flatUsers);
 

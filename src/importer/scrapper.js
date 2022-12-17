@@ -3,6 +3,7 @@ import config from 'nconf';
 import moment from 'moment';
 import logger from '../logger.js';
 import { getLastImport } from './last-import-helper.js';
+import manipulateScrapResult from './scrap-manipulater/index.js';
 
 function toUserOptions(creditCard, index) {
   return {
@@ -58,7 +59,8 @@ export function getFlatUsers(useOnlyAccounts, state, since) {
 
 export function parseScrapResult(results, flatUsers) {
   return results
-    .reduce((m, x, i) => ([...m, ...(enrichAccount(x.accounts || [], flatUsers[i]))]), []);
+    .reduce((m, x, i) => ([...m, ...(enrichAccount(x.accounts || [], flatUsers[i]))]), [])
+    .map(manipulateScrapResult);
 }
 
 export function getSuccessfulScrappedUsers(results, flatUsers) {
@@ -82,7 +84,7 @@ export function logErrorResult(results, flatUsers) {
   }
 }
 
-export async function getScrappedAccounts(flatUsers) {
+export async function scrapAccounts(flatUsers) {
   const scraperConfig = config.get('scraper');
   const actions = flatUsers
     .map((user) => {
