@@ -92,13 +92,7 @@ export async function scrapAccounts(flatUsers) {
       const options = {
         companyId: CompanyTypes[user.type],
         startDate: user.scrapFrom.toDate(),
-        combineInstallments: false,
-        showBrowser: false,
-        args: scraperConfig.args,
-        defaultTimeout: scraperConfig.timeout,
-        outputData: {
-          enableTransactionsFilterByDate: false,
-        },
+        ...scraperConfig.options,
       };
 
       return () => scrape(options, user.credentials);

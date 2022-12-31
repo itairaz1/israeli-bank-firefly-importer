@@ -21,7 +21,7 @@
     "axios": "^0.27.2",
     "config": "^3.3.8",
     "husky": "^8.0.2",
-    "israeli-bank-scrapers": "^3.2.0",
+    "israeli-bank-scrapers": "^3.3.0",
     "js-yaml": "^4.1.0",
     "moment": "^2.29.4",
     "nconf": "^0.12.0",

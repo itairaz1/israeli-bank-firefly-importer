@@ -24,7 +24,15 @@
   ],
   "scraper": {
     "parallel": true,
-    "args": []
+    "options": {
+      "args": [],
+      "combineInstallments": false,
+      "showBrowser": false,
+      "outputData": {
+        "enableTransactionsFilterByDate": false
+      },
+      "additionalTransactionInformation": true
+    }
   },
   "log": {
     "level": "info",
