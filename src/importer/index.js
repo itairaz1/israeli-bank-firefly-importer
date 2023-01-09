@@ -55,6 +55,7 @@ export default async function doImport(options) {
       external_id: getExternalId(x),
       currency_code: x.chargedCurrency,
       process_date: x.processedDate,
+      category_name: x.category,
     }));
 
   logger().info('Manipulating...');
@@ -200,12 +201,12 @@ async function innerUpdateTx({ id, type }, tx, count) {
 }
 
 const getters = {
-  hash: (x) => hash(omitAccount(x)),
+  hash: (x) => hash(omitFields(x)),
   identifier: (x) => x.identifier,
 };
 
-function omitAccount(tx) {
-  const { account, ...rest } = tx;
+function omitFields(tx) {
+  const { account, category, ...rest } = tx;
   return rest;
 }
 
