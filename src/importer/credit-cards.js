@@ -32,13 +32,14 @@ function getCcDesc(accountsMap) {
       [x.type]: [...(m[x.type] || []), x.id],
     }), {});
 
-  return config.get('creditCardDesc').reduce((m, x) => ({
-    ...m,
-    [x.desc]: {
-      ids: typeToIds[x.creditCard],
-      method: x.method || 'process-date',
-    },
-  }), {});
+  return config.get('creditCardDesc')
+    .reduce((m, x) => ({
+      ...m,
+      [x.desc]: {
+        ids: typeToIds[x.creditCard] || [],
+        method: x.method || 'process-date',
+      },
+    }), {});
 }
 
 function ccTag(tx, accountsMap) {
