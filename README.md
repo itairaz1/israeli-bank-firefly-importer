@@ -47,11 +47,10 @@ If you want to let `israeli-bank-firefly-importer` running recurrently, you can 
 ## Missing features and known issues
 1. Support all banks and credit cards.
 2. Code quality: Add tests, error handling, organize code and more.
-3. Add github actions and more...
-4. Consider use typescript.
-5. Support changing config after first run.
-6. Support multi banks.
-7. Make it more CLI friendly.
+3. Consider use typescript.
+4. Support changing config after first run.
+5. Support multi banks.
+6. Make it more CLI friendly.
 
 ## License
 [MIT License](LICENSE)
