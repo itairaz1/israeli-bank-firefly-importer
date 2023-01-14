@@ -8,6 +8,7 @@ export function init() {
     level: config.get('log:level'),
     transport: config.get('log:prettyPrint') ? {
       target: 'pino-pretty',
+      options: { translateTime: 'SYS:yyyy-mm-dd HH:MM:ss.l' },
     } : {},
   });
 }
