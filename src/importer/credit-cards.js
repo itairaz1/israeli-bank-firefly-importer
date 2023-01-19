@@ -1,6 +1,7 @@
 import moment from 'moment';
 import config from 'nconf';
 import { getTxsByTag } from '../firefly.js';
+import logger from '../logger.js';
 
 export default function manipulateTxs(txs, accountsMap) {
   const ccDesc = getCcDesc(accountsMap);
@@ -94,10 +95,13 @@ async function ccTransfer(tx, ccDesc, accountsMap) {
     return tx;
   }
 
+  logger().debug({ tx: tx.description }, 'Found credit card transaction');
   const ccAccountsIds = ccDesc[tx.description];
   const process = methods[ccAccountsIds.method];
   const accountId = await process(tx, ccAccountsIds.ids, accountsMap);
   if (accountId === null) {
+    logger()
+      .warn({ tx: tx.description, ccAccountsIds }, 'Couldn\'t find credit card billing period for transaction');
     return tx;
   }
   return {
