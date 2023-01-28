@@ -40,7 +40,10 @@ export default async function doImport(options) {
 
   const fireTxs = accounts
     .reduce((m, a) => ([...m, ...a.txns
-      .map((tx) => ({ ...tx, account: accountsMaps[a.accountNumber] }))]), [])
+      .map((tx) => ({
+        ...tx,
+        account: accountsMaps[a.accountNumber],
+      }))]), [])
     .filter((x) => x.status === 'completed')
     .filter((x) => x.chargedAmount)
     .map((x) => ({
@@ -88,6 +91,9 @@ export default async function doImport(options) {
       .then(() => innerUpdateTx(currentTxMap[x.external_id], x, i + 1)), Promise.resolve());
   }
 
+  const accountsBalance = await getFireFlyAccountsBalance();
+  logBalanceOutOfSync(accountsBalance, accounts);
+
   logger().info('Updating last import...');
   const scrappedUsers = getSuccessfulScrappedUsers(scrapResult, flatUsers);
   const updatedState = getStateWithLastImport(scrappedUsers, state);
@@ -116,13 +122,41 @@ function calcMonthlyPaymentDate(account) {
   return moment().set('date', topDate).format('YYYY-MM-DD');
 }
 
+async function getFireFlyAccountsBalance() {
+  const rawAccounts = await getAccounts();
+  return rawAccounts.data.data
+    .map((x) => ({
+      accountNumber: x.attributes.account_number,
+      balance: parseFloat(x.attributes.current_balance),
+    }));
+}
+
+function logBalanceOutOfSync(fireFlyAccounts, scrapeAccounts) {
+  const fireFlyAccountsBalanceMap = fireFlyAccounts
+    .reduce((m, x) => ({ ...m, [x.accountNumber]: x.balance }), {});
+  scrapeAccounts
+    .map((x) => ({
+      accountNumber: x.accountNumber,
+      scrapeBalance: x.balance,
+      fireFlyBalance: fireFlyAccountsBalanceMap[x.accountNumber],
+    }))
+    .filter((x) => x.scrapeBalance && x.scrapeBalance !== x.fireFlyBalance)
+    .forEach((x) => logger().warn(x, 'Non synced balance'));
+}
+
 async function createAndMapAccounts(scrapperAccounts) {
-  const map = scrapperAccounts.reduce((m, x) => ({ ...m, [x.accountNumber]: x }), {});
+  const map = scrapperAccounts.reduce((m, x) => ({
+    ...m,
+    [x.accountNumber]: x,
+  }), {});
 
   const rawAccounts = await getAccounts();
   const accountsMap = rawAccounts.data.data
     .filter((x) => x.attributes.account_number && map[x.attributes.account_number])
-    .map((x) => ({ id: x.id, accountNumber: x.attributes.account_number }))
+    .map((x) => ({
+      id: x.id,
+      accountNumber: x.attributes.account_number,
+    }))
     .reduce((m, x) => ({
       ...m,
       [x.accountNumber]: {
@@ -140,7 +174,10 @@ async function createAndMapAccounts(scrapperAccounts) {
       account_number: a,
       type: 'asset',
       account_role: map[a].accountDetails.kind === 'bank' ? 'defaultAsset' : 'ccAsset',
-      ...(map[a].accountDetails.kind !== 'bank' ? { credit_card_type: 'monthlyFull', monthly_payment_date: calcMonthlyPaymentDate(map[a]) } : {}),
+      ...(map[a].accountDetails.kind !== 'bank' ? {
+        credit_card_type: 'monthlyFull',
+        monthly_payment_date: calcMonthlyPaymentDate(map[a]),
+      } : {}),
     })]), Promise.resolve([]));
 
   return results.reduce((m, x) => ({
