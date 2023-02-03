@@ -2,7 +2,7 @@
   "identifyMethod": {
     "isracard": "identifier",
     "leumi": "hash",
-    "visaCal": "hash"
+    "visaCal": "identifier"
   },
   "creditCardDesc": [
     {
