@@ -1,4 +1,4 @@
-# Israeli Bank FireFly iii Importer
+# Israeli Bank Firefly iii Importer
 This project is in early stage! Please feel free to share your ideas and thoughts by creating an [issue](https://github.com/itairaz1/israeli-bank-firefly-importer/issues/new).
 
 Using [Israeli bank scrapper](https://github.com/eshaham/israeli-bank-scrapers) and import the data into free and open source [Firefly iii](https://www.firefly-iii.org/). All this solution is for local installation (self-hosted), so you are not coupled with SaaS provider, but you will have to make sure your host is secured (On your own risk!).
