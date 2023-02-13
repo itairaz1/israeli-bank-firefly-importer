@@ -26,9 +26,9 @@ export function getLastImport(account, state, since) {
     return moment(since);
   }
 
-  // This is for backward compatibility, we can remove it later.
-  if (typeof state === 'string') {
-    return moment(state);
+  // First run, when no state
+  if (!state) {
+    return null;
   }
 
   const accountIdentification = getAccountIdentification(account);
