@@ -38,6 +38,4 @@ RUN npm ci
 # the rest of your dockerfile here
 COPY . .
 
-ENV IBFI_CONFIG_PATH='/home/pptruser/config'
-
 CMD ["npm", "start"]
