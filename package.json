@@ -26,8 +26,8 @@
     "nconf-yaml": "^1.0.2",
     "node-cron": "^3.0.2",
     "object-hash": "^3.0.0",
-    "pino": "^8.10.0",
-    "pino-pretty": "^9.4.0"
+    "pino-pretty": "^9.4.0",
+    "pino": "^8.11.0"
   },
   "devDependencies": {
     "eslint": "^8.34.0",
