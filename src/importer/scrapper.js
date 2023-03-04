@@ -85,6 +85,18 @@ export function logErrorResult(results, flatUsers) {
   }
 }
 
+export function getLightResult(results) {
+  return results.map((r) => ({
+    ...r,
+    accounts: r.accounts
+      .map((a) => ({
+        ...a,
+        txCount: a.txns.length,
+        txns: undefined,
+      })),
+  }));
+}
+
 export async function scrapAccounts(flatUsers) {
   const scraperConfig = config.get('scraper');
   const actions = flatUsers
@@ -103,6 +115,7 @@ export async function scrapAccounts(flatUsers) {
 
 async function scrape(options, credentials) {
   const scraper = createScraper(options);
+  logger().debug({ options }, 'Scrapping...');
   return scraper.scrape(credentials);
 }
 

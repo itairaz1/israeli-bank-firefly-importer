@@ -9,7 +9,12 @@ import {
   getAccounts, getAllTxs, getConfig, searchTxs, updateTx,
 } from '../firefly.js';
 import {
-  getFlatUsers, scrapAccounts, getSuccessfulScrappedUsers, logErrorResult, parseScrapResult,
+  getFlatUsers,
+  scrapAccounts,
+  getSuccessfulScrappedUsers,
+  logErrorResult,
+  getLightResult,
+  parseScrapResult,
 } from './scrapper.js';
 import logger from '../logger.js';
 import { getStateWithLastImport } from './last-import-helper.js';
@@ -33,6 +38,10 @@ export default async function doImport(options) {
   const flatUsers = getFlatUsers(onlyAccounts, lastImportState, since);
   const scrapResult = await scrapAccounts(flatUsers);
   logErrorResult(scrapResult, flatUsers);
+  if (logger().level === 'debug') {
+    logger()
+      .debug({ results: getLightResult(scrapResult) }, 'Scrap result');
+  }
   const accounts = parseScrapResult(scrapResult, flatUsers);
 
   logger().info('Getting or creating accounts...');
@@ -74,14 +83,16 @@ export default async function doImport(options) {
 
   const toCreate = preparedFireTxs.filter((x) => !currentTxMap[x.external_id]);
   const insertDebugData = logger().level === 'debug' ? { toCreate } : {};
-  logger().info({ count: toCreate.length, ...insertDebugData }, 'Creating transactions to firefly...');
+  logger()
+    .info({ count: toCreate.length, ...insertDebugData }, 'Creating transactions to firefly...');
   await toCreate.reduce((p, x, i) => p
     .then(() => innerCreateTx(x, i + 1)), Promise.resolve());
 
   const toTypeUpdate = preparedFireTxs
     .filter((x) => currentTxMap[x.external_id] && currentTxMap[x.external_id].type !== x.type);
   const updateDebugData = logger().level === 'debug' ? { toTypeUpdate } : {};
-  logger().info({ count: toTypeUpdate.length, ...updateDebugData }, 'Updating transactions types to firefly...');
+  logger()
+    .info({ count: toTypeUpdate.length, ...updateDebugData }, 'Updating transactions types to firefly...');
   await toTypeUpdate.reduce((p, x, i) => p
     .then(() => innerUpdateTx(currentTxMap[x.external_id], x, i + 1)), Promise.resolve());
 
