@@ -53,6 +53,9 @@ If you want to let `israeli-bank-firefly-importer` running recurrently, you can 
 4. Support changing config after first run.
 5. Support multi banks.
 6. Make it more CLI friendly.
+7. Refund is not getting deleted.
+
+## Known issues
 
 ## License
 [MIT License](LICENSE)
