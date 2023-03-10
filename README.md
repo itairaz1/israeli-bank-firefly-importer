@@ -35,7 +35,7 @@ Using [Israeli bank scrapper](https://github.com/eshaham/israeli-bank-scrapers) 
 4. Start by running `israeli-bank-firefly-importer` in your terminal.
 
 ## Schedule
-If you want to let `israeli-bank-firefly-importer` running recurrently, you can set [cron expression](https://crontab.guru/) in `CRON` environment variable. 
+If you want to let `israeli-bank-firefly-importer` running recurrently, you can set [cron expression](https://crontab.guru/) in `CRON` environment variable.
 
 ## Supported accounts
 ### Supported and tested accounts
@@ -45,6 +45,13 @@ If you want to let `israeli-bank-firefly-importer` running recurrently, you can 
 
 ### Supported by [Israeli bank scrapper](https://github.com/eshaham/israeli-bank-scrapers) but not yet tested ([Report an issue](https://github.com/itairaz1/israeli-bank-firefly-importer/issues/new))
 [Support list](https://github.com/eshaham/israeli-bank-scrapers#whats-here)
+
+## Changing settings
+The accounts and transactions that created are being created with some details and settings that you can change. For example, you can remove `Include in net worth` from credit card accounts, if you wish. There are some details that you don't want to change, since this importer is using them in order to keep track:
+1. Account's number.
+2. Transaction's Tags.
+3. If exists, transaction's External ID.
+4. If transaction's External ID not exists - All transactions settings shouldn't be change except budget.
 
 ## Missing features and known issues
 1. Test all banks and credit cards.
