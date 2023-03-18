@@ -1,7 +1,6 @@
 /* eslint-disable no-await-in-loop */
 import config from 'nconf';
 import axios from 'axios';
-import logger from './logger.js';
 
 let fireflyAxios;
 
@@ -16,71 +15,45 @@ export async function searchTxs(options) {
   const query = Object.keys(options)
     .reduce((m, x) => `${m} ${x}:${options[x]}`, '')
     .trim();
-  let page = 1;
-  let totalPages = 1;
-  const fireFlyData = [];
-  while (page <= totalPages) {
-    const res = await fireflyAxios.get('/api/v1/search/transactions', {
-      params: {
-        query,
-        page,
-      },
-    });
+  return paginate('/api/v1/search/transactions', query);
+}
 
-    logger().info({
-      currentPage: res.data.meta.pagination.current_page,
-      totalPages: res.data.meta.pagination.total_pages,
-    }, 'Transaction page fetched');
+async function paginate(url, query) {
+  const fireFlyData = [];
+  const urlSearchParams = new URLSearchParams({
+    limit: config.get('firefly:limit'),
+    ...query ? { query } : {},
+  });
+  let nextPage = `${url}?${urlSearchParams}`;
+  while (nextPage) {
+    let res;
+    try {
+      res = await fireflyAxios.get(nextPage);
+    } catch (e) {
+      if (e?.response?.status === 404) {
+        return [];
+      }
+      throw e;
+    }
 
     fireFlyData.push(...res.data.data);
-    totalPages = res.data.meta.pagination.total_pages;
-    page += 1;
+    nextPage = res.data.links.next;
   }
 
   return fireFlyData;
 }
 
 export async function getAllTxs() {
-  let nextPage = '/api/v1/transactions';
-  const fireFlyData = [];
-  while (nextPage) {
-    const res = await fireflyAxios.get(nextPage);
-
-    logger().info({
-      currentPage: res.data.meta.pagination.current_page,
-      totalPages: res.data.meta.pagination.total_pages,
-    }, 'Transaction page fetched');
-
-    fireFlyData.push(...res.data.data);
-    nextPage = res.data.links.next;
-  }
-
-  return fireFlyData;
+  return paginate('/api/v1/search/transactions');
 }
 
 const getTxsByTagCache = {};
 
 export async function getTxsByTag(tag) {
-  if (getTxsByTagCache[tag]) {
-    return getTxsByTagCache[tag];
+  if (!getTxsByTagCache[tag]) {
+    getTxsByTagCache[tag] = paginate(`/api/v1/tags/${tag}/transactions`);
   }
-  let nextPage = `/api/v1/tags/${tag}/transactions`;
-  const fireFlyData = [];
-  while (nextPage) {
-    let res;
-    try {
-      res = await fireflyAxios.get(nextPage);
-    } catch (e) {
-      if (e.response.status === 404) {
-        return [];
-      }
-    }
-
-    fireFlyData.push(...res.data.data);
-    nextPage = res.data.links.next;
-  }
-  getTxsByTagCache[tag] = fireFlyData;
-  return fireFlyData;
+  return getTxsByTagCache[tag];
 }
 
 export function createTx(transactions) {

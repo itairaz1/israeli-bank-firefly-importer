@@ -1,4 +1,7 @@
 {
+  "firefly": {
+    "limit": 1000
+  },
   "identifyMethod": {
     "isracard": "identifier",
     "leumi": "hash",

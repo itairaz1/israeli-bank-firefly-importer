@@ -4,20 +4,41 @@ import moment from 'moment';
 import manipulateTxs from './credit-cards.js';
 import {
   createAccount,
+  createTx,
+  deleteTx,
+  getAccounts,
+  getAllTxs,
+  getConfig,
+  searchTxs,
+  updateTx,
   upsertConfig,
-  createTx, deleteTx,
-  getAccounts, getAllTxs, getConfig, searchTxs, updateTx,
 } from '../firefly.js';
 import {
   getFlatUsers,
-  scrapAccounts,
+  getLightResult,
   getSuccessfulScrappedUsers,
   logErrorResult,
-  getLightResult,
   parseScrapResult,
+  scrapAccounts,
 } from './scrapper.js';
 import logger from '../logger.js';
 import { getStateWithLastImport } from './last-import-helper.js';
+
+async function getMappedTransactions(scrapeFormattedTxs) {
+  const minimalDate = scrapeFormattedTxs
+    .map((x) => moment(x.date))
+    .reduce((m, x) => (x.isBefore(m) ? x : m), moment());
+  const getTxSince = moment(minimalDate).subtract(1, 'day');
+  const since = getTxSince.format('YYYY-MM-DD');
+  logger().info({ since }, 'Getting firefly transactions to compare...');
+  const workingTxs = await searchTxs({ date_after: since });
+  logger()
+    .debug({
+      numberOfTransactionsFromFirefly: workingTxs.length,
+      since,
+    }, 'Got transactions from firefly');
+  return getExistsTxMap(workingTxs);
+}
 
 export default async function doImport(options) {
   const { skipEdit } = options;
@@ -47,7 +68,7 @@ export default async function doImport(options) {
   logger().info('Getting or creating accounts...');
   const accountsMaps = await createAndMapAccounts(accounts);
 
-  const fireTxs = accounts
+  const scrapeFormattedTxs = accounts
     .reduce((m, a) => ([...m, ...a.txns
       .map((tx) => ({
         ...tx,
@@ -71,15 +92,8 @@ export default async function doImport(options) {
     }));
 
   logger().info('Manipulating...');
-  const preparedFireTxs = await manipulateTxs(fireTxs, accountsMaps);
-
-  logger().info('Getting map...');
-  const minimalDate = fireTxs
-    .map((x) => moment(x.date))
-    .reduce((m, x) => (x.isBefore(m) ? x : m), moment());
-  const getTxSince = moment(minimalDate).subtract(1, 'day');
-  const workingTxs = await searchTxs({ date_after: getTxSince.format('YYYY-MM-DD') });
-  const currentTxMap = await getExistsTxMap(workingTxs);
+  const preparedFireTxs = await manipulateTxs(scrapeFormattedTxs, accountsMaps);
+  const currentTxMap = await getMappedTransactions(scrapeFormattedTxs);
 
   const toCreate = preparedFireTxs.filter((x) => !currentTxMap[x.external_id]);
   const insertDebugData = logger().level === 'debug' ? { toCreate } : {};
@@ -104,7 +118,7 @@ export default async function doImport(options) {
       .then(() => innerUpdateTx(currentTxMap[x.external_id], x, i + 1)), Promise.resolve());
   }
 
-  const accountsBalance = await getFireFlyAccountsBalance();
+  const accountsBalance = await getFireflyAccountsBalance();
   logBalanceOutOfSync(accountsBalance, accounts);
 
   logger().info('Updating last import...');
@@ -115,8 +129,8 @@ export default async function doImport(options) {
   logger().info('Done.');
 }
 
-async function getExistsTxMap(fireFlyData) {
-  return fireFlyData
+function getExistsTxMap(fireflyData) {
+  return fireflyData
     .map((x) => ({
       type: x.attributes.transactions[0].type,
       ext_id: x.attributes.transactions[0].external_id,
@@ -148,7 +162,7 @@ function calcMonthlyPaymentDate(account) {
   return moment().set('date', topDate).format('YYYY-MM-DD');
 }
 
-async function getFireFlyAccountsBalance() {
+async function getFireflyAccountsBalance() {
   const rawAccounts = await getAccounts();
   return rawAccounts.data.data
     .map((x) => ({
@@ -157,8 +171,8 @@ async function getFireFlyAccountsBalance() {
     }));
 }
 
-function logBalanceOutOfSync(fireFlyAccounts, scrapeAccounts) {
-  const fireFlyAccountsBalanceMap = fireFlyAccounts
+function logBalanceOutOfSync(fireflyAccounts, scrapeAccounts) {
+  const fireflyAccountsBalanceMap = fireflyAccounts
     .reduce((m, x) => ({
       ...m,
       [x.accountNumber]: x.balance,
@@ -167,9 +181,9 @@ function logBalanceOutOfSync(fireFlyAccounts, scrapeAccounts) {
     .map((x) => ({
       accountNumber: x.accountNumber,
       scrapeBalance: x.balance,
-      fireFlyBalance: fireFlyAccountsBalanceMap[x.accountNumber],
+      fireflyBalance: fireflyAccountsBalanceMap[x.accountNumber],
     }))
-    .filter((x) => x.scrapeBalance && x.scrapeBalance !== x.fireFlyBalance)
+    .filter((x) => x.scrapeBalance && x.scrapeBalance !== x.fireflyBalance)
     .forEach((x) => logger().warn(x, 'Non synced balance'));
 }
 
@@ -220,13 +234,13 @@ async function createAndMapAccounts(scrapperAccounts) {
 
 async function drop() {
   logger().info('Getting data for drop');
-  const fireFlyData = await getAllTxs();
-  const toDrop = fireFlyData
+  const fireflyData = await getAllTxs();
+  const toDrop = fireflyData
     .map((x) => ({ id: x.id, ...x.attributes.transactions[0] }));
 
   logger().info({
     count: toDrop.length,
-    total: fireFlyData.length,
+    total: fireflyData.length,
   }, 'Dropping transactions');
 
   let count = 1;

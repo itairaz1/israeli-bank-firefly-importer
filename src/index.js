@@ -40,5 +40,5 @@ try {
   }
 } catch (err) {
   logger()
-    .error(err);
+    .error(err, 'Critical error');
 }
