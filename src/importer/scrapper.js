@@ -89,7 +89,7 @@ export function getLightResult(results) {
   return results.map((r) => ({
     ...r,
     accounts: r.accounts
-      .map((a) => ({
+      ?.map((a) => ({
         ...a,
         txCount: a.txns.length,
         txns: undefined,
