@@ -42,6 +42,7 @@ If you want to let `israeli-bank-firefly-importer` running recurrently, you can 
 1. Leumi
 2. Isracard
 3. Cal
+3. Max
 
 ### Supported by [Israeli bank scrapper](https://github.com/eshaham/israeli-bank-scrapers) but not yet tested ([Report an issue](https://github.com/itairaz1/israeli-bank-firefly-importer/issues/new))
 [Support list](https://github.com/eshaham/israeli-bank-scrapers#whats-here)

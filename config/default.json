@@ -23,6 +23,10 @@
     {
       "desc": "כרטיסי אשראי-י",
       "creditCard": "visaCal"
+    },
+    {
+      "desc": "מקס איט פיננ-י",
+      "creditCard": "max"
     }
   ],
   "scraper": {
