@@ -26,10 +26,12 @@
     "nconf-yaml": "^1.0.2",
     "node-cron": "^3.0.2",
     "object-hash": "^3.0.0",
-    "pino-pretty": "^10.0.0",
-    "pino": "^8.14.1"
+    "pino": "^8.14.1",
+    "pino-pretty": "^10.0.0"
   },
   "devDependencies": {
+    "@codedependant/semantic-release-docker": "^4.3.0",
+    "@semantic-release/git": "^10.0.1",
     "eslint": "^8.41.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-base": "^15.0.0",
