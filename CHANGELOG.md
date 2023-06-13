@@ -1,3 +1,10 @@
+## [1.3.5](https://github.com/itairaz1/israeli-bank-firefly-importer/compare/v1.3.4...v1.3.5) (2023-06-13)
+
+
+### Bug Fixes
+
+* **state:** Handle case when config not found [#21](https://github.com/itairaz1/israeli-bank-firefly-importer/issues/21) ([7efffcd](https://github.com/itairaz1/israeli-bank-firefly-importer/commit/7efffcd8b7bd093980a599e6a996dfc7ed3b80ad))
+
 ## [1.3.4](https://github.com/itairaz1/israeli-bank-firefly-importer/compare/v1.3.3...v1.3.4) (2023-06-13)
 
 
