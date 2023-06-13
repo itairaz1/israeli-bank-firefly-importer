@@ -7,6 +7,11 @@
     "leumi": "hash",
     "visaCal": "identifier"
   },
+  "currencySymbolMap": {
+    "₪": "ILS",
+    "$": "USD",
+    "€": "EUR"
+  },
   "creditCardDesc": [
     {
       "desc": "ל.מאסטרקרד(יש)",

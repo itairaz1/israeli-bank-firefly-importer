@@ -40,6 +40,14 @@ async function getMappedTransactions(scrapeFormattedTxs) {
   return getExistsTxMap(workingTxs);
 }
 
+function getCurrencyCode(x) {
+  const currency = x.chargedCurrency || x.originalCurrency;
+  if (!currency) {
+    return undefined;
+  }
+  return config.get('currencySymbolMap')[currency] || currency;
+}
+
 export default async function doImport(options) {
   const { skipEdit } = options;
   const { onlyAccounts } = options;
@@ -86,7 +94,7 @@ export default async function doImport(options) {
       destination_id: x.chargedAmount > 0 ? x.account.id : undefined,
       internal_reference: x.identifier,
       external_id: getExternalId(x),
-      currency_code: x.chargedCurrency,
+      currency_code: getCurrencyCode(x),
       process_date: x.processedDate,
       category_name: x.category,
     }));
@@ -262,6 +270,7 @@ async function innerCreateTx(tx, count) {
   } catch (e) {
     logger()
       .error({
+        message: e?.response?.data?.message,
         error: e,
         tx,
       }, 'Error creating transaction');
@@ -285,6 +294,7 @@ async function innerUpdateTx({
   } catch (e) {
     logger()
       .error({
+        message: e?.response?.data?.message,
         error: e,
         tx,
       }, 'Error updating transaction');
