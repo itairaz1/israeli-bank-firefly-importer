@@ -34,6 +34,20 @@ Using [Israeli bank scrapper](https://github.com/eshaham/israeli-bank-scrapers) 
    ```
 4. Start by running `israeli-bank-firefly-importer` in your terminal.
 
+### Using docker
+You can build docker using following command:
+```shell
+docker build image-name:tag
+```
+Or you can just use the official docker `itair86/israel-bank-firefly-importer` and run it by the following command:
+```shell
+docker run -v path-to/config.yaml:/home/pptruser/app/config.yaml itair86/israel-bank-firefly-importer:latest
+```
+While `path-to/config.yaml` is path to your config file (See [installing steps](#steps-quick-start), step #3)
+
+### Using Home Assistant
+Check [israeli-bank-firefly-importer-hass-addon](https://github.com/itairaz1/israeli-bank-firefly-importer-hass-addon) repository.
+
 ## Schedule
 If you want to let `israeli-bank-firefly-importer` running recurrently, you can set [cron expression](https://crontab.guru/) in `CRON` environment variable.
 
@@ -42,7 +56,7 @@ If you want to let `israeli-bank-firefly-importer` running recurrently, you can 
 1. Leumi
 2. Isracard
 3. Cal
-3. Max
+4. Max
 
 ### Supported by [Israeli bank scrapper](https://github.com/eshaham/israeli-bank-scrapers) but not yet tested ([Report an issue](https://github.com/itairaz1/israeli-bank-firefly-importer/issues/new))
 [Support list](https://github.com/eshaham/israeli-bank-scrapers#whats-here)
