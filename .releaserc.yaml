@@ -6,8 +6,8 @@ plugins:
   - '@semantic-release/github'
   - '@semantic-release/changelog'
   - '@semantic-release/git'
-  - - '@codedependant/semantic-release-docker':
-        dockerImage: 'itair86/israel-bank-firefly-importer'
+  - - '@codedependant/semantic-release-docker'
+    - dockerImage: 'itair86/israel-bank-firefly-importer'
 branches:
   - '+([0-9])?(.{+([0-9]),x}).x'
   - 'main'
