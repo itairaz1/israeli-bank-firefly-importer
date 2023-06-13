@@ -48,6 +48,19 @@ function getCurrencyCode(x) {
   return config.get('currencySymbolMap')[currency] || currency;
 }
 
+async function getFireflyState() {
+  try {
+    const axiosState = await getConfig();
+    return JSON.parse(axiosState.data.data.attributes.data);
+  } catch (err) {
+    if (err?.response?.status === 404) {
+      logger().debug('Firefly config not found, using empty object.');
+      return {};
+    }
+    throw err;
+  }
+}
+
 export default async function doImport(options) {
   const { skipEdit } = options;
   const { onlyAccounts } = options;
@@ -59,8 +72,7 @@ export default async function doImport(options) {
   }
 
   logger().info('Getting state from firefly...');
-  const axiosState = await getConfig();
-  const state = JSON.parse(axiosState.data.data.attributes.data);
+  const state = await getFireflyState();
   const lastImportState = state.lastImport;
 
   logger().info('Getting scrap data...');
