@@ -48,6 +48,7 @@
   },
   "log": {
     "level": "info",
-    "prettyPrint": true
+    "prettyPrint": true,
+    "redact": ["error.config.headers.Authorization"]
   }
 }

@@ -10,6 +10,7 @@ export function init() {
       target: 'pino-pretty',
       options: { translateTime: 'SYS:yyyy-mm-dd HH:MM:ss.l' },
     } : {},
+    redact: config.get('log:redact'),
   });
 }
 
