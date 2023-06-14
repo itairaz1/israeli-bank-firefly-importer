@@ -20,7 +20,10 @@ async function run() {
     });
   } catch (err) {
     logger()
-      .error(err, 'Fatal error');
+      .error({
+        error: err,
+        message: err?.response?.data?.message,
+      }, 'Fatal error');
   }
 }
 
