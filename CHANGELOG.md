@@ -1,3 +1,11 @@
+## [1.3.6](https://github.com/itairaz1/israeli-bank-firefly-importer/compare/v1.3.5...v1.3.6) (2023-06-14)
+
+
+### Bug Fixes
+
+* **log:** Log firefly error message on fatal error ([d852fcc](https://github.com/itairaz1/israeli-bank-firefly-importer/commit/d852fcc36be1d17c6a85548bf149f581f725bee7))
+* **log:** Redact sensitive data from log ([ddf3590](https://github.com/itairaz1/israeli-bank-firefly-importer/commit/ddf359010aae9f89af837115c7363331ebe69f2d))
+
 ## [1.3.5](https://github.com/itairaz1/israeli-bank-firefly-importer/compare/v1.3.4...v1.3.5) (2023-06-13)
 
 
