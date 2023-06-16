@@ -54,7 +54,7 @@ async function getFireflyState() {
     return JSON.parse(axiosState.data.data.attributes.data);
   } catch (err) {
     if (err?.response?.status === 404) {
-      logger().debug('Firefly config not found, using empty object.');
+      logger().debug('Firefly previous state not found (its ok if its first run), using empty object.');
       return {};
     }
     throw err;
