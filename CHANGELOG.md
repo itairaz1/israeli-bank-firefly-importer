@@ -1,3 +1,10 @@
+## [1.3.7](https://github.com/itairaz1/israeli-bank-firefly-importer/compare/v1.3.6...v1.3.7) (2023-07-08)
+
+
+### Bug Fixes
+
+* **log:** Added logs when scrapper fail [#51](https://github.com/itairaz1/israeli-bank-firefly-importer/issues/51) ([5379260](https://github.com/itairaz1/israeli-bank-firefly-importer/commit/53792603995b199737fd8be08af630e0c84731d5))
+
 ## [1.3.6](https://github.com/itairaz1/israeli-bank-firefly-importer/compare/v1.3.5...v1.3.6) (2023-06-14)
 
 
