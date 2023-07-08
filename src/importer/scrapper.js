@@ -116,7 +116,16 @@ export async function scrapAccounts(flatUsers) {
 async function scrape(options, credentials) {
   const scraper = createScraper(options);
   logger().debug({ options }, 'Scrapping...');
-  return scraper.scrape(credentials);
+  try {
+    return await scraper.scrape(credentials);
+  } catch (error) {
+    logger().error({ error, options }, 'Unexpected error while scrapping');
+    return {
+      success: false,
+      errorType: 'GENERAL_ERROR',
+      errorMessage: error.message,
+    };
+  }
 }
 
 function runActions(actions, parallel) {
