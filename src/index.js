@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
+import { readFile } from 'fs/promises';
 import config from 'nconf';
 import { schedule } from 'node-cron';
-import { readFile } from 'fs/promises';
 import loadConfig from './load-config.js';
 import doImport from './importer/index.js';
 import logger, { init as loggerInit } from './logger.js';

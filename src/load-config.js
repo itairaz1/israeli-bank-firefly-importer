@@ -1,6 +1,6 @@
+import { createRequire } from 'node:module';
 import config from 'nconf';
 import nconfYaml from 'nconf-yaml';
-import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
 
