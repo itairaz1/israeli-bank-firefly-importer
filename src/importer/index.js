@@ -233,7 +233,7 @@ async function createAndMapAccounts(scrapperAccounts) {
     .filter((x) => !accountsMap[x]);
 
   if (missedAccounts.length === 0) {
-    return [];
+    return accountsMap;
   }
 
   logger().info({ missedAccounts }, 'Accounts are missing from Firefly, creating them...');
