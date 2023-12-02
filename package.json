@@ -27,7 +27,7 @@
     "moment": "^2.29.4",
     "nconf": "^0.12.1",
     "nconf-yaml": "^1.0.2",
-    "node-cron": "^3.0.2",
+    "node-cron": "^3.0.3",
     "object-hash": "^3.0.0",
     "pino": "^8.16.2",
     "pino-pretty": "^10.2.3"
