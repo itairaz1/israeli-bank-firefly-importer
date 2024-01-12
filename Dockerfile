@@ -23,7 +23,7 @@ RUN groupadd -r pptruser && useradd -r -g pptruser -G audio,video pptruser \
     && mkdir -p /home/pptruser/config \
     && chown -R pptruser:pptruser /home/pptruser \
     && chown -R pptruser:pptruser /home/pptruser/app \
-    && chown -R pptruser:pptruser /home/pptruser/config \
+    && chown -R pptruser:pptruser /home/pptruser/config
 
 # Run everything after as non-privileged user.
 USER pptruser
