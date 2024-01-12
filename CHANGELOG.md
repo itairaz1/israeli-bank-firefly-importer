@@ -12,6 +12,13 @@
 
 * **deps:** Bump israeli-bank-scraper ([42b5448](https://github.com/itairaz1/israeli-bank-firefly-importer/commit/42b54486cc0315be1650f4d2183e0e86ee0e3160))
 
+# [1.4.0](https://github.com/itairaz1/israeli-bank-firefly-importer/compare/v1.3.7...v1.4.0) (2024-01-12)
+
+
+### Features
+
+* **deps:** Bump israeli-bank-scraper ([42b5448](https://github.com/itairaz1/israeli-bank-firefly-importer/commit/42b54486cc0315be1650f4d2183e0e86ee0e3160))
+
 # [1.4.0](https://github.com/itairaz1/israeli-bank-firefly-importer/compare/v1.3.7...v1.4.0) (2023-12-22)
 
 
