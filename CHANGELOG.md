@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/itairaz1/israeli-bank-firefly-importer/compare/v1.4.0...v1.4.1) (2024-02-03)
+
+
+### Bug Fixes
+
+* **Leumi:** Bump scrapper that has a fix to Leumi ([b42a484](https://github.com/itairaz1/israeli-bank-firefly-importer/commit/b42a484318b75c3e9cb52ed903c3271eee35fa04))
+
 # [1.4.0](https://github.com/itairaz1/israeli-bank-firefly-importer/compare/v1.3.7...v1.4.0) (2024-01-12)
 
 
