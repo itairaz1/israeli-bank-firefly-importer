@@ -77,5 +77,14 @@ The accounts and transactions that created are being created with some details a
 6. Make it more CLI friendly.
 7. Refund is not getting deleted.
 
+## Report a bug
+To report a bug please [create an issue](https://github.com/itairaz1/israeli-bank-firefly-importer/issues/new) with the following details:
+1. Detailed bug description
+2. Israel Bank Firefly Importer version
+3. Firefly iii version
+4. Operating system
+5. Installation type (Native / Docker / HA addon)
+6. Sensitized debug log - example of how to turn on debug logs [here](https://github.com/itairaz1/israeli-bank-firefly-importer/blob/main/config/example.yaml#L34). Make sure you going through the logs and remove any sensitive data.
+
 ## License
 [MIT License](LICENSE)

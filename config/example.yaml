@@ -31,3 +31,5 @@ scraper:
   parallel: true
   timeout: 60000
 
+log:
+  level: debug
