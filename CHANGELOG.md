@@ -1,6 +1,18 @@
 # [1.5.0](https://github.com/itairaz1/israeli-bank-firefly-importer/compare/v1.4.2...v1.5.0) (2024-04-23)
 
 
+### Bug Fixes
+
+* **bump:** Revert eslint 9 bump ([e6fc63b](https://github.com/itairaz1/israeli-bank-firefly-importer/commit/e6fc63bf5064b3dee1906a2608abbe0d2e5f1a57))
+
+
+### Features
+
+* **deps:** bump israeli-bank-scrapers from 4.4.2 to 4.5.0 ([#121](https://github.com/itairaz1/israeli-bank-firefly-importer/issues/121)) ([96c531c](https://github.com/itairaz1/israeli-bank-firefly-importer/commit/96c531c5bb7ac73ddda996beb54e45680a98c4be))
+
+# [1.5.0](https://github.com/itairaz1/israeli-bank-firefly-importer/compare/v1.4.2...v1.5.0) (2024-04-23)
+
+
 ### Features
 
 * **deps:** bump israeli-bank-scrapers from 4.4.2 to 4.5.0 ([#121](https://github.com/itairaz1/israeli-bank-firefly-importer/issues/121)) ([96c531c](https://github.com/itairaz1/israeli-bank-firefly-importer/commit/96c531c5bb7ac73ddda996beb54e45680a98c4be))
