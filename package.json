@@ -30,7 +30,7 @@
     "node-cron": "^3.0.3",
     "object-hash": "^3.0.0",
     "pino": "^9.3.1",
-    "pino-pretty": "^11.2.1"
+    "pino-pretty": "^11.2.2"
   },
   "devDependencies": {
     "eslint": "^8.57.0",
