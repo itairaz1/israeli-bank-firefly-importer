@@ -1,6 +1,6 @@
 {
   "name": "israeli-bank-firefly-importer",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "description": "Using Israeli bank scrapper and import the data into free and open source FireFly iii.",
   "main": "src/index.js",
   "type": "module",
