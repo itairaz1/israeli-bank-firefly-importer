@@ -1,3 +1,10 @@
+## [1.5.5](https://github.com/itairaz1/israeli-bank-firefly-importer/compare/v1.5.4...v1.5.5) (2025-03-13)
+
+
+### Bug Fixes
+
+* **leumi:** update account number validation in manipulate function ([#211](https://github.com/itairaz1/israeli-bank-firefly-importer/issues/211)) ([4a7338b](https://github.com/itairaz1/israeli-bank-firefly-importer/commit/4a7338bc5bd58c5b952ec40cdf70cbabedbfde75))
+
 ## [1.5.4](https://github.com/itairaz1/israeli-bank-firefly-importer/compare/v1.5.3...v1.5.4) (2024-11-29)
 
 
