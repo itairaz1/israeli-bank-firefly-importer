@@ -1,6 +1,6 @@
 {
   "name": "israeli-bank-firefly-importer",
-  "version": "1.5.4",
+  "version": "1.5.5",
   "description": "Using Israeli bank scrapper and import the data into free and open source FireFly iii.",
   "main": "src/index.js",
   "type": "module",
@@ -21,7 +21,7 @@
   "license": "MIT",
   "repository": "https://github.com/itairaz1/israeli-bank-firefly-importer",
   "dependencies": {
-    "axios": "^1.7.8",
+    "axios": "^1.7.9",
     "israeli-bank-scrapers": "^5.2.2",
     "js-yaml": "^4.1.0",
     "moment": "^2.30.1",
