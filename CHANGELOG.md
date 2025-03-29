@@ -1,3 +1,10 @@
+## [1.5.7](https://github.com/itairaz1/israeli-bank-firefly-importer/compare/v1.5.6...v1.5.7) (2025-03-29)
+
+
+### Bug Fixes
+
+* **bump:** bump israeli-bank-scrapers from 5.4.2 to 5.4.4 ([#216](https://github.com/itairaz1/israeli-bank-firefly-importer/issues/216)) ([9dfea97](https://github.com/itairaz1/israeli-bank-firefly-importer/commit/9dfea97ebedc7ede7059f87d30ba6d7050373eb5))
+
 ## [1.5.6](https://github.com/itairaz1/israeli-bank-firefly-importer/compare/v1.5.5...v1.5.6) (2025-03-13)
 
 
