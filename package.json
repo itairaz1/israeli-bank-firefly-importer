@@ -21,7 +21,7 @@
   "license": "MIT",
   "repository": "https://github.com/itairaz1/israeli-bank-firefly-importer",
   "dependencies": {
-    "axios": "^1.12.2",
+    "axios": "^1.13.2",
     "israeli-bank-scrapers": "^6.2.2",
     "js-yaml": "^4.1.0",
     "moment": "^2.30.1",
