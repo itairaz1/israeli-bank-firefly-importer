@@ -30,9 +30,9 @@ build:
 
 remove-dev-deps:
 	@echo "removing dev dependencies"
-	@cd ./israeli-bank-scrapers && npm prune --production
+	@cd ./israeli-bank-scrapers && npm prune --omit=dev
 	@cd ..
-	@npm prune --production
+	@npm prune --omit=dev
 
 docker-create:	
 	@echo  "creating docker..."
