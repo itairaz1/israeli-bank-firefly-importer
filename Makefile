@@ -8,8 +8,12 @@ init:
 		echo "israeli-bank-scrapers already exists"; \
 	fi
 
+patch-generate:
+	@cd ./israeli-bank-scrapers && git diff > ../scrapper-patches/patch-$$(date +%Y%m%d%H%M%S).patch && cd ..
+
 patch-scrapers:
 	@if [ -d "./scrapper-patches" ]; then \
+		cd ./israeli-bank-scrapers && git checkout . && cd ..; \
 		echo "Applying patches from scrapper-patches..."; \
 		for patch in ./scrapper-patches/*.patch; do \
 			if [ -f "$$patch" ]; then \
