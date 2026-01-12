@@ -33,12 +33,13 @@ WORKDIR /home/pptruser/app
 
 COPY --chown=pptruser:pptruser ["Makefile", "package.json", "package-lock.json*", "tsconfig.json", "./"]
 COPY --chown=pptruser:pptruser israeli-bank-scrapers ./israeli-bank-scrapers
+COPY --chown=pptruser:pptruser scrapper-patches* ./scrapper-patches/
 
 RUN make patch-scrapers
 # the rest of your dockerfile here
 COPY --chown=pptruser:pptruser . .
 
-RUN make build
+RUN make build-npm
 RUN make remove-dev-deps
 
 CMD ["npm", "start"]

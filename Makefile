@@ -21,22 +21,29 @@ patch-scrapers:
 		echo "No scrapper-patches folder found"; \
 	fi
 
-build: 
+build-npm: 
 	@echo "building israeli-bank-scrapers"
-	@cd ./israeli-bank-scrapers && npm i && npm run build
-	@cd ..
+	# first install and build israeli-bank-scrapers
+	@pushd ./israeli-bank-scrapers 
+	@npm i && npm run build
+	@popd
+	# then install and build this project
 	@npm install
 	@npm run build
 
 remove-dev-deps:
 	@echo "removing dev dependencies"
-	@cd ./israeli-bank-scrapers && npm prune --omit=dev
-	@cd ..
+	# first remove dev dependencies from israeli-bank-scrapers
+	@pushd ./israeli-bank-scrapers 
+	@npm prune --omit=dev
+	@popd
+	# then remove dev dependencies from this project
 	@npm prune --omit=dev
 
 docker-create:	
 	@echo  "creating docker..."
-	@docker build -t $(DOCKER_IMAGE) .
+	@docker build -t $(DOCKER_IMAGE) --no-cache .
 
 docker-run:
-	docker run --rm -it $(DOCKER_IMAGE)
+	@echo "running docker"
+	@docker run --rm -it $(DOCKER_IMAGE)
