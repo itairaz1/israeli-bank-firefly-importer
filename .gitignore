@@ -2,3 +2,5 @@
 node_modules
 config/local*.yaml
 config.yaml
+israeli-bank-scrappers/
+scrapper-patches/
