@@ -5,7 +5,17 @@ import logger from '../logger.js';
 import { getLastImport } from './last-import-helper.js';
 import manipulateScrapResult from './scrap-manipulater/index.js';
 
-function toUserOptions(creditCard, index) {
+interface User {
+  type: string;
+  credentials: Record<string, string>;
+  parentBankIndex?: number;
+  name?: string;
+  creditCards?: any[];
+  lastImport?: string;
+  scrapFrom?: moment.Moment;
+}
+
+function toUserOptions(creditCard: any, index?: number): User {
   return {
     type: creditCard.type,
     credentials: creditCard.credentials,
@@ -14,7 +24,7 @@ function toUserOptions(creditCard, index) {
   };
 }
 
-function enrichAccount(accounts, currentAccount) {
+function enrichAccount(accounts: any[], currentAccount: User) {
   const accountDetails = currentAccount.parentBankIndex !== undefined ? {
     type: currentAccount.type,
     kind: 'credit-card',
@@ -28,7 +38,7 @@ function enrichAccount(accounts, currentAccount) {
   }));
 }
 
-function getScrapFrom(account) {
+function getScrapFrom(account: User) {
   if (account.lastImport) {
     return moment(account.lastImport)
       .subtract(7, 'days');
@@ -36,41 +46,41 @@ function getScrapFrom(account) {
 
   // Fallback to 5y ago
   return moment()
-    .subtract('5', 'years');
+    .subtract(5, 'years');
 }
 
-export function getFlatUsers(useOnlyAccounts, state, since) {
+export function getFlatUsers(useOnlyAccounts: string[] | undefined, state: any, since: any) {
   if (!config.get('banks')) {
     throw new Error('No banks in config');
   }
-  return config.get('banks')
-    .flatMap((bank, i) => ([toUserOptions(bank), ...(bank.creditCards || [])
-      .map((cc) => toUserOptions(cc, i))]))
-    .filter((x) => !useOnlyAccounts || useOnlyAccounts.includes(x.name))
-    .map((x) => ({
+  return (config.get('banks') as any[])
+    .flatMap((bank: any, i: number) => ([toUserOptions(bank), ...(bank.creditCards || [])
+      .map((cc: any) => toUserOptions(cc, i))]))
+    .filter((x: User) => !useOnlyAccounts || (x.name && useOnlyAccounts.includes(x.name)))
+    .map((x: User) => ({
       ...x,
       lastImport: getLastImport(x, state, since),
     }))
-    .map((x) => ({
+    .map((x: any) => ({
       ...x,
       scrapFrom: getScrapFrom(x),
     }));
 }
 
-export function parseScrapResult(results, flatUsers) {
+export function parseScrapResult(results: any[], flatUsers: User[]) {
   return results
     .reduce((m, x, i) => ([...m, ...(enrichAccount(x.accounts || [], flatUsers[i]))]), [])
     .map(manipulateScrapResult)
-    .filter((x) => x);
+    .filter((x: any) => x);
 }
 
-export function getSuccessfulScrappedUsers(results, flatUsers) {
+export function getSuccessfulScrappedUsers(results: any[], flatUsers: User[]) {
   return results
     .map((x, i) => (x.success ? flatUsers[i] : null))
     .filter((x) => x);
 }
 
-export function logErrorResult(results, flatUsers) {
+export function logErrorResult(results: any[], flatUsers: User[]) {
   const error = results
     .map((x, i) => (x.success ? null : ({
       ...x,
@@ -81,15 +91,15 @@ export function logErrorResult(results, flatUsers) {
     .join(', ');
   if (error) {
     logger()
-      .error(error, 'Scrapping failed. Ignoring...');
+      .error({ error }, 'Scrapping failed. Ignoring...');
   }
 }
 
-export function getLightResult(results) {
+export function getLightResult(results: any[]) {
   return results.map((r) => ({
     ...r,
     accounts: r.accounts
-      ?.map((a) => ({
+      ?.map((a: any) => ({
         ...a,
         txCount: a.txns.length,
         txns: undefined,
@@ -97,12 +107,12 @@ export function getLightResult(results) {
   }));
 }
 
-export async function scrapAccounts(flatUsers) {
+export async function scrapAccounts(flatUsers: any[]) {
   const scraperConfig = config.get('scraper');
   const actions = flatUsers
     .map((user) => {
       const options = {
-        companyId: CompanyTypes[user.type],
+        companyId: (CompanyTypes as any)[user.type],
         startDate: user.scrapFrom.toDate(),
         ...scraperConfig.options,
       };
@@ -113,12 +123,12 @@ export async function scrapAccounts(flatUsers) {
   return runActions(actions, scraperConfig.parallel);
 }
 
-async function scrape(options, credentials) {
+async function scrape(options: any, credentials: any) {
   const scraper = createScraper(options);
   logger().debug({ options }, 'Scrapping...');
   try {
     return await scraper.scrape(credentials);
-  } catch (error) {
+  } catch (error: any) {
     logger().error({ error, options }, 'Unexpected error while scrapping');
     return {
       success: false,
@@ -128,9 +138,12 @@ async function scrape(options, credentials) {
   }
 }
 
-function runActions(actions, parallel) {
+function runActions(actions: (() => Promise<any>)[], parallel: boolean) {
   if (parallel) {
     return Promise.all(actions.map((x) => x()));
   }
-  return actions.reduce((m, a) => m.then(async (x) => [...x, await a()]), Promise.resolve([]));
+  return actions.reduce<Promise<any[]>>(
+    (m, a) => m.then(async (x) => [...x, await a()]),
+    Promise.resolve([]),
+  );
 }

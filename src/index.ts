@@ -22,7 +22,7 @@ async function run() {
     logger()
       .error({
         error: err,
-        message: err?.response?.data?.message,
+        message: (err as any)?.response?.data?.message,
       }, 'Fatal error');
   }
 }

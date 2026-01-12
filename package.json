@@ -2,37 +2,46 @@
   "name": "israeli-bank-firefly-importer",
   "version": "1.5.10",
   "description": "Using Israeli bank scrapper and import the data into free and open source FireFly iii.",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "type": "module",
   "engines": {
-    "node": ">= 18.0.0"
+    "node": ">= 25.0.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/index.js",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "node --loader ts-node/esm src/index.ts",
     "prepare": "npx husky install",
-    "lint": "eslint src --fix"
+    "lint": "eslint src --ext .ts,.js --fix"
   },
   "bin": {
-    "@itair86/israeli-bank-firefly-importer": "src/index.js",
-    "israeli-bank-firefly-importer": "src/index.js"
+    "@itair86/israeli-bank-firefly-importer": "dist/index.js",
+    "israeli-bank-firefly-importer": "dist/index.js"
   },
   "author": "Itai Raz",
   "license": "MIT",
   "repository": "https://github.com/itairaz1/israeli-bank-firefly-importer",
   "dependencies": {
     "axios": "^1.12.2",
-    "israeli-bank-scrapers": "^6.2.2",
+    "israeli-bank-scrapers": "file:./israeli-bank-scrapers",
     "js-yaml": "^4.1.0",
     "moment": "^2.30.1",
     "nconf": "^0.13.0",
     "nconf-yaml": "^1.0.2",
     "node-cron": "^4.2.1",
     "object-hash": "^3.0.0",
-    "pino-pretty": "^13.0.0",
-    "pino": "^9.11.0"
+    "pino": "^9.11.0",
+    "pino-pretty": "^13.0.0"
   },
   "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/nconf": "^0.10.7",
+    "@types/node": "^25.0.6",
+    "@types/node-cron": "^3.0.11",
+    "@types/object-hash": "^3.0.6",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
     "eslint": "^8.57.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-base": "^15.0.0",
@@ -40,6 +49,8 @@
     "eslint-plugin-jsx-a11y": "^6.8.0",
     "eslint-plugin-react": "^7.34.1",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "husky": "^9.1.7"
+    "husky": "^9.1.7",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
   }
 }

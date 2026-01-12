@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-const identifyAccountByType = {
+const identifyAccountByType: Record<string, (c: any) => string> = {
   leumi: (c) => c.username,
   visaCal: (c) => c.username,
   beinleumi: (c) => c.username,
@@ -16,11 +16,11 @@ const identifyAccountByType = {
   hapoalim: (c) => c.userCode,
 };
 
-function getAccountIdentification(user) {
+function getAccountIdentification(user: any) {
   return `${user.type}_${identifyAccountByType[user.type](user.credentials)}`;
 }
 
-export function getLastImport(account, state, since) {
+export function getLastImport(account: any, state: any, since: any) {
   // When override
   if (since) {
     return moment(since);
@@ -39,10 +39,10 @@ export function getLastImport(account, state, since) {
   return null;
 }
 
-export function getStateWithLastImport(users, state) {
+export function getStateWithLastImport(users: any[], state: any) {
   const now = moment().toISOString();
   const lastState = typeof state.lastImport === 'string' ? {} : state.lastImport;
-  const newLastImport = users.reduce((m, u) => ({
+  const newLastImport = users.reduce((m: any, u: any) => ({
     ...m,
     [getAccountIdentification(u)]: now,
   }), lastState);
