@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "target": "ES2023",
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
+        "skipLibCheck": true,
+        "outDir": "./dist",
+        "rootDir": "./src",
+        "allowJs": true,
+        "checkJs": false
+    },
+    "include": [
+        "src/**/*"
+    ],
+    "exclude": [
+        "node_modules",
+        "israeli-bank-scrapers"
+    ]
+}

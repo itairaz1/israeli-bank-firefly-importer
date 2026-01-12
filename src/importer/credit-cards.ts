@@ -3,15 +3,15 @@ import config from 'nconf';
 import { getTxsByTag } from '../firefly.js';
 import logger from '../logger.js';
 
-export default function manipulateTxs(txs, accountsMap) {
+export default function manipulateTxs(txs: any[], accountsMap: any) {
   const ccDesc = getCcDesc(accountsMap);
   return txs.reduce(
-    (m, tx) => m.then(async (x) => [...x, await manipulateTx(tx, ccDesc, accountsMap)]),
+    (m, tx) => m.then(async (x: any) => [...x, await manipulateTx(tx, ccDesc, accountsMap)]),
     Promise.resolve([]),
   );
 }
 
-async function manipulateTx(tx, ccDesc, accountsMap) {
+async function manipulateTx(tx: any, ccDesc: any, accountsMap: any) {
   let newTx = tx;
   newTx = {
     ...newTx,
@@ -21,20 +21,20 @@ async function manipulateTx(tx, ccDesc, accountsMap) {
   return newTx;
 }
 
-function getCcDesc(accountsMap) {
+function getCcDesc(accountsMap: any) {
   const typeToIds = Object.values(accountsMap)
-    .filter((x) => x.kind === 'credit-card')
-    .map((x) => ({
+    .filter((x: any) => x.kind === 'credit-card')
+    .map((x: any) => ({
       type: x.type,
       id: x.id,
     }))
-    .reduce((m, x) => ({
+    .reduce((m: any, x: any) => ({
       ...m,
       [x.type]: [...(m[x.type] || []), x.id],
     }), {});
 
   return config.get('creditCardDesc')
-    .reduce((m, x) => ({
+    .reduce((m: any, x: any) => ({
       ...m,
       [x.desc]: {
         ids: typeToIds[x.creditCard] || [],
@@ -43,9 +43,9 @@ function getCcDesc(accountsMap) {
     }), {});
 }
 
-function ccTag(tx, accountsMap) {
+function ccTag(tx: any, accountsMap: any) {
   const isCc = Object.values(accountsMap)
-    .some((x) => x.kind === 'credit-card' && (x.id === tx.source_id || x.id === tx.destination_id));
+    .some((x: any) => x.kind === 'credit-card' && (x.id === tx.source_id || x.id === tx.destination_id));
   if (!isCc) {
     return null;
   }
@@ -54,17 +54,17 @@ function ccTag(tx, accountsMap) {
   return [`${accountId}_${processDate}`];
 }
 
-const methods = {
+const methods: Record<string, (...args: any[]) => any> = {
   'process-date': processByProcessDate,
   reference: processByReference,
 };
 
-async function processByReference(tx, ccAccountsIds, accountsMap) {
+async function processByReference(tx: any, ccAccountsIds: any, accountsMap: any) {
   const accountNumber = tx.internal_reference;
   return accountsMap[accountNumber].id;
 }
 
-async function processByProcessDate(tx, ccAccountsIds) {
+async function processByProcessDate(tx: any, ccAccountsIds: any) {
   const processDate = tx.process_date;
 
   let index;
@@ -76,7 +76,9 @@ async function processByProcessDate(tx, ccAccountsIds) {
 
     index = 0;
   } else {
-    const amountsByIndex = await Promise.all(ccAccountsIds.map((x) => getTxAmount(processDate, x)));
+    const amountsByIndex = await Promise.all(
+      ccAccountsIds.map((x: any) => getTxAmount(processDate, x)),
+    );
     const nonAbsAmount = (tx.type === 'deposit' ? 1 : -1) * tx.amount;
     index = amountsByIndex.indexOf(nonAbsAmount);
     if (index === -1) {
@@ -87,7 +89,7 @@ async function processByProcessDate(tx, ccAccountsIds) {
   return ccAccountsIds[index];
 }
 
-async function ccTransfer(tx, ccDesc, accountsMap) {
+async function ccTransfer(tx: any, ccDesc: any, accountsMap: any) {
   if (tx.type === 'transfer') {
     return tx;
   }
@@ -112,7 +114,7 @@ async function ccTransfer(tx, ccDesc, accountsMap) {
   };
 }
 
-async function getTxAmount(processDate, accountId) {
+async function getTxAmount(processDate: string, accountId: number) {
   let res = await getTxsByTag(`${accountId}_${processDate}`);
   if (res.length === 0) {
     const yd = moment(processDate)
@@ -120,7 +122,7 @@ async function getTxAmount(processDate, accountId) {
       .toISOString();
     res = await getTxsByTag(`${accountId}_${yd}`);
   }
-  const txs = res.map((x) => x.attributes.transactions[0]);
-  const sum = txs.reduce((m, x) => (x.type === 'deposit' ? 1 : -1) * x.amount + m, 0);
+  const txs = res.map((x: any) => x.attributes.transactions[0]);
+  const sum = txs.reduce((m: number, x: any) => (x.type === 'deposit' ? 1 : -1) * x.amount + m, 0);
   return Math.round(sum * 100) / 100;
 }

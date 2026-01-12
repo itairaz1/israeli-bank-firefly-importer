@@ -1,7 +1,7 @@
 import pino from 'pino';
 import config from 'nconf';
 
-let pinoInstance;
+let pinoInstance: pino.Logger;
 
 export function init() {
   pinoInstance = pino({
@@ -9,7 +9,7 @@ export function init() {
     transport: config.get('log:prettyPrint') ? {
       target: 'pino-pretty',
       options: { translateTime: 'SYS:yyyy-mm-dd HH:MM:ss.l' },
-    } : {},
+    } : undefined,
     redact: config.get('log:redact'),
   });
 }

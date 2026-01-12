@@ -3,17 +3,29 @@
         "browser": true,
         "es6": true
     },
-    "extends": "airbnb-base",
-    "overrides": [
+    "extends": [
+        "airbnb-base",
+        "plugin:@typescript-eslint/recommended"
     ],
+    "parser": "@typescript-eslint/parser",
+    "plugins": [
+        "@typescript-eslint"
+    ],
+    "overrides": [],
     "parserOptions": {
         "ecmaVersion": "latest",
         "sourceType": "module"
     },
     "rules": {
         "no-use-before-define": "off",
-        "import/extensions": [0, {
-            "js": "always"
-        }]
+        "import/extensions": [
+            0,
+            {
+                "js": "always",
+                "ts": "never"
+            }
+        ],
+        "import/no-unresolved": "off",
+        "@typescript-eslint/no-explicit-any": "off"
     }
 }
