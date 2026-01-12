@@ -34,9 +34,7 @@ remove-dev-deps:
 	@cd ..
 	@npm prune --production
 
-docker-create:
-	@echo "building israeli-bank-scrapers"
-	@cd ./israeli-bank-scrapers && npm i && npm run build
+docker-create:	
 	@echo  "creating docker..."
 	@docker build -t $(DOCKER_IMAGE) .
 
