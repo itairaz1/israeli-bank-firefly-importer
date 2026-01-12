@@ -13,7 +13,7 @@ patch-generate:
 
 patch-scrapers:
 	@if [ -d "./scrapper-patches" ]; then \
-		cd ./israeli-bank-scrapers && git checkout . && cd ..; \
+		cd ./israeli-bank-scrapers && git checkout . && git pull && cd ..; \
 		echo "Applying patches from scrapper-patches..."; \
 		for patch in ./scrapper-patches/*.patch; do \
 			if [ -f "$$patch" ]; then \
