@@ -24,14 +24,21 @@ patch-scrapers:
 build: 
 	@echo "building israeli-bank-scrapers"
 	@cd ./israeli-bank-scrapers && npm i && npm run build
-	cd ..
-	npm install
+	@cd ..
+	@npm install
+	@npm run build
+
+remove-dev-deps:
+	@echo "removing dev dependencies"
+	@cd ./israeli-bank-scrapers && npm prune --production
+	@cd ..
+	@npm prune --production
 
 docker-create:
 	@echo "building israeli-bank-scrapers"
 	@cd ./israeli-bank-scrapers && npm i && npm run build
 	@echo  "creating docker..."
-	docker build -t $(DOCKER_IMAGE) .
+	@docker build -t $(DOCKER_IMAGE) .
 
 docker-run:
 	docker run --rm -it $(DOCKER_IMAGE)
