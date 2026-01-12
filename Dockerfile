@@ -34,6 +34,7 @@ WORKDIR /home/pptruser/app
 COPY --chown=pptruser:pptruser ["Makefile", "package.json", "package-lock.json*", "tsconfig.json", "./"]
 COPY --chown=pptruser:pptruser israeli-bank-scrapers ./israeli-bank-scrapers
 
+RUN make patch-scrapers
 # the rest of your dockerfile here
 COPY --chown=pptruser:pptruser . .
 
