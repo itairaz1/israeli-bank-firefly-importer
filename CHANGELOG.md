@@ -1,3 +1,10 @@
+## [1.5.11](https://github.com/itairaz1/israeli-bank-firefly-importer/compare/v1.5.10...v1.5.11) (2026-06-27)
+
+
+### Bug Fixes
+
+* paginate getAccounts to handle >50 Firefly accounts ([#301](https://github.com/itairaz1/israeli-bank-firefly-importer/issues/301)) ([429fa06](https://github.com/itairaz1/israeli-bank-firefly-importer/commit/429fa06bebc836a4dd7d33a193f81dfb762b170c))
+
 ## [1.5.10](https://github.com/itairaz1/israeli-bank-firefly-importer/compare/v1.5.9...v1.5.10) (2025-08-30)
 
 
