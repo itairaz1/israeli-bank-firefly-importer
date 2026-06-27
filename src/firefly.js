@@ -68,8 +68,9 @@ export function deleteTx(id) {
   return fireflyAxios.delete(`/api/v1/transactions/${id}`);
 }
 
-export function getAccounts() {
-  return fireflyAxios.get('/api/v1/accounts');
+export async function getAccounts() {
+  const data = await paginate('/api/v1/accounts');
+  return { data: { data } };
 }
 
 export function createAccount(data) {
