@@ -1,3 +1,10 @@
+## [1.5.12](https://github.com/itairaz1/israeli-bank-firefly-importer/compare/v1.5.11...v1.5.12) (2026-07-03)
+
+
+### Bug Fixes
+
+* **docker:** chown copied files to pptruser to fix permission denied errors ([#313](https://github.com/itairaz1/israeli-bank-firefly-importer/issues/313)) ([65064b3](https://github.com/itairaz1/israeli-bank-firefly-importer/commit/65064b354023ac22ebd7674aa1aa887afe4f6132)), closes [#279](https://github.com/itairaz1/israeli-bank-firefly-importer/issues/279)
+
 ## [1.5.11](https://github.com/itairaz1/israeli-bank-firefly-importer/compare/v1.5.10...v1.5.11) (2026-06-27)
 
 
