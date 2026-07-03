@@ -29,10 +29,10 @@ RUN groupadd -r pptruser && useradd -r -g pptruser -G audio,video pptruser \
 USER pptruser
 
 WORKDIR /home/pptruser/app
-COPY ["package.json", "package-lock.json*", "./"]
+COPY --chown=pptruser:pptruser ["package.json", "package-lock.json*", "./"]
 
 RUN npm ci
 # the rest of your dockerfile here
-COPY . .
+COPY --chown=pptruser:pptruser . .
 
 CMD ["npm", "start"]
