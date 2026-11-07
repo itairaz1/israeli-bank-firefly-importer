@@ -74,11 +74,10 @@ The accounts and transactions that created are being created with some details a
 ## Missing features and known issues
 1. Test all banks and credit cards.
 2. Code quality: Add tests, error handling, organize code and more.
-3. Consider use typescript.
-4. Support changing config after first run.
-5. Support multi banks.
-6. Make it more CLI friendly.
-7. Refund is not getting deleted.
+3. Support changing config after first run.
+4. Support multi banks.
+5. Make it more CLI friendly.
+6. Refund is not getting deleted.
 
 ## Report a bug
 To report a bug please [create an issue](https://github.com/itairaz1/israeli-bank-firefly-importer/issues/new) with the following details:
