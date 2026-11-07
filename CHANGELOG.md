@@ -1,3 +1,10 @@
+## [1.6.1](https://github.com/itairaz1/israeli-bank-firefly-importer/compare/v1.6.0...v1.6.1) (2026-11-07)
+
+
+### Bug Fixes
+
+* **docker:** bump Node to 22 to satisfy israeli-bank-scrapers engines ([#316](https://github.com/itairaz1/israeli-bank-firefly-importer/issues/316)) ([c6627d9](https://github.com/itairaz1/israeli-bank-firefly-importer/commit/c6627d9ffa6d84115770eb6550c424d09c642d97))
+
 # [1.6.0](https://github.com/itairaz1/israeli-bank-firefly-importer/compare/v1.5.13...v1.6.0) (2026-11-07)
 
 
