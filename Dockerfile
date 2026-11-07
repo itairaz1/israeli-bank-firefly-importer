@@ -35,4 +35,7 @@ RUN npm ci
 # the rest of your dockerfile here
 COPY --chown=pptruser:pptruser . .
 
+# Compile TypeScript, then drop dev dependencies from the final image
+RUN npm run build && npm prune --omit=dev
+
 CMD ["npm", "start"]

@@ -1,19 +1,37 @@
 {
+    "root": true,
     "env": {
-        "browser": true,
-        "es6": true
+        "node": true,
+        "es2022": true
     },
-    "extends": "airbnb-base",
-    "overrides": [
+    "extends": [
+        "airbnb-base",
+        "plugin:@typescript-eslint/recommended"
     ],
+    "parser": "@typescript-eslint/parser",
     "parserOptions": {
         "ecmaVersion": "latest",
-        "sourceType": "module"
+        "sourceType": "module",
+        "project": "./tsconfig.json"
     },
+    "plugins": ["@typescript-eslint"],
+    "settings": {
+        "import/parsers": {
+            "@typescript-eslint/parser": [".ts"]
+        },
+        "import/resolver": {
+            "typescript": {
+                "project": "./tsconfig.json"
+            }
+        }
+    },
+    "ignorePatterns": ["dist"],
     "rules": {
         "no-use-before-define": "off",
-        "import/extensions": [0, {
-            "js": "always"
-        }]
+        "import/extensions": "off",
+        "no-unused-vars": "off",
+        "@typescript-eslint/no-unused-vars": ["error", { "ignoreRestSiblings": true }],
+        "no-shadow": "off",
+        "@typescript-eslint/no-shadow": "error"
     }
 }

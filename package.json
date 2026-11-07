@@ -2,20 +2,24 @@
   "name": "israeli-bank-firefly-importer",
   "version": "1.5.13",
   "description": "Using Israeli bank scrapper and import the data into free and open source FireFly iii.",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "type": "module",
   "engines": {
     "node": ">= 18.0.0"
   },
   "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/index.js",
+    "start": "node dist/index.js",
+    "dev": "npm run build && npm start",
     "prepare": "npx husky install",
-    "lint": "eslint src --fix"
+    "prepack": "npm run build",
+    "lint": "eslint src --ext .ts --fix"
   },
   "bin": {
-    "@itair86/israeli-bank-firefly-importer": "src/index.js",
-    "israeli-bank-firefly-importer": "src/index.js"
+    "@itair86/israeli-bank-firefly-importer": "dist/index.js",
+    "israeli-bank-firefly-importer": "dist/index.js"
   },
   "author": "Itai Raz",
   "license": "MIT",
@@ -33,13 +37,20 @@
     "pino-pretty": "^13.2.0"
   },
   "devDependencies": {
+    "@types/nconf": "^0.10.7",
+    "@types/node": "^18.19.130",
+    "@types/object-hash": "^3.0.6",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
     "eslint": "^8.57.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-import-resolver-typescript": "^3.10.1",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^4.6.2",
-    "husky": "^9.1.7"
+    "husky": "^9.1.7",
+    "typescript": "^5.9.3"
   }
 }

@@ -9,6 +9,8 @@ import {
   getAccounts,
   getAllTxs,
   getConfig,
+  getErrorMessage,
+  isNotFoundError,
   searchTxs,
   updateTx,
   upsertConfig,
@@ -23,8 +25,42 @@ import {
 } from './scrapper.js';
 import logger from '../logger.js';
 import { getStateWithLastImport } from './last-import-helper.js';
+import type {
+  AccountsMap,
+  EnrichedAccount,
+  FireflyAccountRead,
+  FireflyTxInput,
+  FireflyTxRead,
+  FireflyTxType,
+  ImporterState,
+  MappedAccount,
+  Transaction,
+} from '../types.js';
 
-async function getMappedTransactions(scrapeFormattedTxs) {
+export interface ImportOptions {
+  skipEdit?: boolean;
+  onlyAccounts?: string[];
+  cleanup?: boolean;
+  since?: string;
+}
+
+interface ExistingTx {
+  id: string;
+  type: FireflyTxType;
+}
+
+type ExistingTxMap = Record<string, ExistingTx>;
+
+type ScrapedTx = Transaction & { account: MappedAccount };
+
+type CreateAccountResponse = Awaited<ReturnType<typeof createAccount>>;
+
+interface AccountBalance {
+  accountNumber: string | null;
+  balance: number;
+}
+
+async function getMappedTransactions(scrapeFormattedTxs: FireflyTxInput[]): Promise<ExistingTxMap> {
   const minimalDate = scrapeFormattedTxs
     .map((x) => moment(x.date))
     .reduce((m, x) => (x.isBefore(m) ? x : m), moment());
@@ -40,20 +76,21 @@ async function getMappedTransactions(scrapeFormattedTxs) {
   return getExistsTxMap(workingTxs);
 }
 
-function getCurrencyCode(x) {
+function getCurrencyCode(x: Transaction): string | undefined {
   const currency = x.chargedCurrency || x.originalCurrency;
   if (!currency) {
     return undefined;
   }
-  return config.get('currencySymbolMap')[currency] || currency;
+  const currencySymbolMap: Record<string, string> = config.get('currencySymbolMap');
+  return currencySymbolMap[currency] || currency;
 }
 
-async function getFireflyState() {
+async function getFireflyState(): Promise<ImporterState> {
   try {
     const axiosState = await getConfig();
     return JSON.parse(axiosState.data.data.attributes.data);
   } catch (err) {
-    if (err?.response?.status === 404) {
+    if (isNotFoundError(err)) {
       logger()
         .debug('Firefly previous state not found (its ok if its first run), using empty object.');
       return {};
@@ -62,7 +99,7 @@ async function getFireflyState() {
   }
 }
 
-export default async function doImport(options) {
+export default async function doImport(options: ImportOptions): Promise<void> {
   const { skipEdit } = options;
   const { onlyAccounts } = options;
   const { cleanup } = options;
@@ -90,14 +127,14 @@ export default async function doImport(options) {
   const accountsMaps = await createAndMapAccounts(accounts);
 
   const scrapeFormattedTxs = accounts
-    .reduce((m, a) => ([...m, ...a.txns
+    .reduce<ScrapedTx[]>((m, a) => ([...m, ...a.txns
       .map((tx) => ({
         ...tx,
         account: accountsMaps[a.accountNumber],
       }))]), [])
     .filter((x) => x.status === 'completed')
     .filter((x) => x.chargedAmount)
-    .map((x) => ({
+    .map((x): FireflyTxInput => ({
       type: x.chargedAmount > 0 ? 'deposit' : 'withdrawal',
       date: x.date,
       amount: Math.abs(x.chargedAmount),
@@ -150,40 +187,41 @@ export default async function doImport(options) {
   logger().info('Done.');
 }
 
-function getExistsTxMap(fireflyData) {
+function getExistsTxMap(fireflyData: FireflyTxRead[]): ExistingTxMap {
   return fireflyData
     .map((x) => ({
       type: x.attributes.transactions[0].type,
       ext_id: x.attributes.transactions[0].external_id,
       id: x.id,
     }))
-    .reduce((m, {
+    .reduce<ExistingTxMap>((m, {
       id,
       ext_id: extId,
       type,
     }) => ({
       ...m,
-      [extId]: {
+      [String(extId)]: {
         id,
         type,
       },
     }), {});
 }
 
-function calcMonthlyPaymentDate(account) {
+function calcMonthlyPaymentDate(account: EnrichedAccount): string {
   const sumMap = account.txns
     .map((x) => moment(x.processedDate).date())
-    .reduce((m, x) => ({
+    .reduce<Record<string, number>>((m, x) => ({
       ...m,
       [x]: (m[x] || 0) + 1,
     }), {});
 
-  const topDate = Object.keys(sumMap).reduce((m, x) => (m && sumMap[m] > sumMap[x] ? m : x), 0);
+  const topDate = Object.keys(sumMap)
+    .reduce<string | number>((m, x) => (m && sumMap[m] > sumMap[x] ? m : x), 0);
 
-  return moment().set('date', topDate).format('YYYY-MM-DD');
+  return moment().set('date', Number(topDate)).format('YYYY-MM-DD');
 }
 
-async function getFireflyAccountsBalance() {
+async function getFireflyAccountsBalance(): Promise<AccountBalance[]> {
   const rawAccounts = await getAccounts();
   return rawAccounts.data.data
     .map((x) => ({
@@ -192,11 +230,14 @@ async function getFireflyAccountsBalance() {
     }));
 }
 
-function logBalanceOutOfSync(fireflyAccounts, scrapeAccounts) {
+function logBalanceOutOfSync(
+  fireflyAccounts: AccountBalance[],
+  scrapeAccounts: EnrichedAccount[],
+): void {
   const fireflyAccountsBalanceMap = fireflyAccounts
-    .reduce((m, x) => ({
+    .reduce<Record<string, number>>((m, x) => ({
       ...m,
-      [x.accountNumber]: x.balance,
+      [String(x.accountNumber)]: x.balance,
     }), {});
   scrapeAccounts
     .map((x) => ({
@@ -208,20 +249,22 @@ function logBalanceOutOfSync(fireflyAccounts, scrapeAccounts) {
     .forEach((x) => logger().warn(x, 'Non synced balance'));
 }
 
-async function createAndMapAccounts(scrapperAccounts) {
-  const map = scrapperAccounts.reduce((m, x) => ({
+async function createAndMapAccounts(scrapperAccounts: EnrichedAccount[]): Promise<AccountsMap> {
+  const map = scrapperAccounts.reduce<Record<string, EnrichedAccount>>((m, x) => ({
     ...m,
     [x.accountNumber]: x,
   }), {});
 
   const rawAccounts = await getAccounts();
   const accountsMap = rawAccounts.data.data
-    .filter((x) => x.attributes.account_number && map[x.attributes.account_number])
+    .filter((x): x is FireflyAccountRead & { attributes: { account_number: string } } => (
+      !!x.attributes.account_number && !!map[x.attributes.account_number]
+    ))
     .map((x) => ({
       id: x.id,
       accountNumber: x.attributes.account_number,
     }))
-    .reduce((m, x) => ({
+    .reduce<AccountsMap>((m, x) => ({
       ...m,
       [x.accountNumber]: {
         ...map[x.accountNumber].accountDetails,
@@ -239,27 +282,30 @@ async function createAndMapAccounts(scrapperAccounts) {
   logger().info({ missedAccounts }, 'Accounts are missing from Firefly, creating them...');
 
   const results = await missedAccounts
-    .reduce((m, a) => m.then(async (x) => [...x, await createAccount({
-      name: a,
-      account_number: a,
-      type: 'asset',
-      account_role: map[a].accountDetails.kind === 'bank' ? 'defaultAsset' : 'ccAsset',
-      ...(map[a].accountDetails.kind !== 'bank' ? {
-        credit_card_type: 'monthlyFull',
-        monthly_payment_date: calcMonthlyPaymentDate(map[a]),
-      } : {}),
-    })]), Promise.resolve([]));
+    .reduce<Promise<CreateAccountResponse[]>>((m, a) => m.then(async (x) => [
+      ...x,
+      await createAccount({
+        name: a,
+        account_number: a,
+        type: 'asset',
+        account_role: map[a].accountDetails.kind === 'bank' ? 'defaultAsset' : 'ccAsset',
+        ...(map[a].accountDetails.kind !== 'bank' ? {
+          credit_card_type: 'monthlyFull',
+          monthly_payment_date: calcMonthlyPaymentDate(map[a]),
+        } : {}),
+      }),
+    ]), Promise.resolve([]));
 
-  return results.reduce((m, x) => ({
+  return results.reduce<AccountsMap>((m, x) => ({
     ...m,
-    [x.data.data.attributes.account_number]: {
-      ...map[x.data.data.attributes.account_number].accountDetails,
+    [String(x.data.data.attributes.account_number)]: {
+      ...map[String(x.data.data.attributes.account_number)].accountDetails,
       id: x.data.data.id,
     },
   }), accountsMap);
 }
 
-async function drop() {
+async function drop(): Promise<void> {
   logger().info('Getting data for drop');
   const fireflyData = await getAllTxs();
   const toDrop = fireflyData
@@ -277,10 +323,10 @@ async function drop() {
     if (count % 50 === 0) {
       logger().info({ currentAmount: count }, 'Transactions deleted');
     }
-  }, Promise.resolve()));
+  }), Promise.resolve());
 }
 
-async function innerCreateTx(tx, count) {
+async function innerCreateTx(tx: FireflyTxInput, count: number): Promise<void> {
   try {
     await createTx([tx]);
     if (count % 50 === 0) {
@@ -289,17 +335,18 @@ async function innerCreateTx(tx, count) {
   } catch (e) {
     logger()
       .error({
-        message: e?.response?.data?.message,
+        message: getErrorMessage(e),
         error: e,
         tx,
       }, 'Error creating transaction');
   }
 }
 
-async function innerUpdateTx({
-  id,
-  type,
-}, tx, count) {
+async function innerUpdateTx(
+  { id, type }: ExistingTx,
+  tx: FireflyTxInput,
+  count: number,
+): Promise<void> {
   try {
     if (type !== tx.type) {
       await deleteTx(id);
@@ -313,19 +360,21 @@ async function innerUpdateTx({
   } catch (e) {
     logger()
       .error({
-        message: e?.response?.data?.message,
+        message: getErrorMessage(e),
         error: e,
         tx,
       }, 'Error updating transaction');
   }
 }
 
-const getters = {
+type IdGetter = (x: ScrapedTx) => string;
+
+const getters: Record<string, IdGetter> = {
   hash: (x) => hash(omitFields(x)),
-  identifier: (x) => x.identifier,
+  identifier: (x) => x.identifier as string,
 };
 
-function omitFields(tx) {
+function omitFields(tx: ScrapedTx) {
   const {
     account,
     category,
@@ -334,8 +383,9 @@ function omitFields(tx) {
   return rest;
 }
 
-function getExternalId(tx) {
-  const identifyMethod = config.get('identifyMethod')[tx.account.type] || 'identifier';
+function getExternalId(tx: ScrapedTx): string {
+  const identifyMethods: Record<string, string> = config.get('identifyMethod');
+  const identifyMethod = identifyMethods[tx.account.type] || 'identifier';
   const getter = getters[identifyMethod] || getters.identifier;
   return getter(tx);
 }

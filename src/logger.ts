@@ -1,20 +1,20 @@
-import pino from 'pino';
+import pino, { Logger } from 'pino';
 import config from 'nconf';
 
-let pinoInstance;
+let pinoInstance: Logger;
 
-export function init() {
+export function init(): void {
   pinoInstance = pino({
     level: config.get('log:level'),
     transport: config.get('log:prettyPrint') ? {
       target: 'pino-pretty',
       options: { translateTime: 'SYS:yyyy-mm-dd HH:MM:ss.l' },
-    } : {},
+    } : undefined,
     redact: config.get('log:redact'),
   });
 }
 
-export default function getPino() {
+export default function getPino(): Logger {
   return pinoInstance;
 }
 
