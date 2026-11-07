@@ -1,4 +1,6 @@
 # Israeli Bank Firefly iii Importer
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+
 This project is in early stage! Please feel free to share your ideas and thoughts by creating an [issue](https://github.com/itairaz1/israeli-bank-firefly-importer/issues/new).
 
 Using [Israeli bank scrapper](https://github.com/eshaham/israeli-bank-scrapers) and import the data into free and open source [Firefly iii](https://www.firefly-iii.org/). All this solution is for local installation (self-hosted), so you are not coupled with SaaS provider, but you will have to make sure your host is secured (On your own risk!).
@@ -8,6 +10,7 @@ Using [Israeli bank scrapper](https://github.com/eshaham/israeli-bank-scrapers) 
 2. Every run imports only the missing transactions.
 3. Locate credit-card end-of-period transactions in your bank account, and change it to transfer transaction to the correct credit-card inorder to keep credit-card balance correct.
 4. Optionally periodically running using CRON. 
+5. Written in TypeScript with strict type checking.
 
 ## Installing
 ### Prerequisite
@@ -87,7 +90,11 @@ To report a bug please [create an issue](https://github.com/itairaz1/israeli-ban
 6. Sensitized debug log - example of how to turn on debug logs [here](https://github.com/itairaz1/israeli-bank-firefly-importer/blob/main/config/example.yaml#L34). Make sure you going through the logs and remove any sensitive data.
 
 ## Development
-The project is written in TypeScript (`src/`) and compiled to `dist/`.
+The project is written in TypeScript (`src/`, strict mode) and compiled to JavaScript in `dist/`.
+Nothing changes for users: the npm package and Docker image ship the compiled code, so installing and running work as before.
+
+Shared types (config, scraped accounts, Firefly API data) are in [`src/types.ts`](src/types.ts).
+
 1. `npm install`
 2. `npm run build` - compile to `dist/` (`npm run typecheck` to only type-check).
 3. `CONFIG_FILE=./config.yaml npm start` - run the compiled importer.
