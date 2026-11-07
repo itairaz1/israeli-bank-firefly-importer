@@ -1,3 +1,10 @@
+## [1.6.2](https://github.com/itairaz1/israeli-bank-firefly-importer/compare/v1.6.1...v1.6.2) (2026-11-07)
+
+
+### Bug Fixes
+
+* **docker:** run under tini to reap orphaned Chrome processes ([#318](https://github.com/itairaz1/israeli-bank-firefly-importer/issues/318)) ([58cb6f0](https://github.com/itairaz1/israeli-bank-firefly-importer/commit/58cb6f0768d4b5eccc2ac0d84c875c3fd2517ad9)), closes [#205](https://github.com/itairaz1/israeli-bank-firefly-importer/issues/205)
+
 ## [1.6.1](https://github.com/itairaz1/israeli-bank-firefly-importer/compare/v1.6.0...v1.6.1) (2026-11-07)
 
 
