@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/itairaz1/israeli-bank-firefly-importer/compare/v1.5.13...v1.6.0) (2026-11-07)
+
+
+### Features
+
+* convert project to TypeScript ([#315](https://github.com/itairaz1/israeli-bank-firefly-importer/issues/315)) ([a3d7e98](https://github.com/itairaz1/israeli-bank-firefly-importer/commit/a3d7e98143a75fe142f4ede26107f0ab8e01a503))
+
 ## [1.5.13](https://github.com/itairaz1/israeli-bank-firefly-importer/compare/v1.5.12...v1.5.13) (2026-11-07)
 
 
