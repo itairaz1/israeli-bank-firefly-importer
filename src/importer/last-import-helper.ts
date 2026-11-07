@@ -1,6 +1,14 @@
-import moment from 'moment';
+import moment, { Moment } from 'moment';
+import type {
+  Credentials,
+  ImporterState,
+  LastImportState,
+  UserOptions,
+} from '../types.js';
 
-const identifyAccountByType = {
+type Identifier = (c: Credentials) => string;
+
+const identifyAccountByType: Record<string, Identifier> = {
   leumi: (c) => c.username,
   visaCal: (c) => c.username,
   beinleumi: (c) => c.username,
@@ -16,11 +24,15 @@ const identifyAccountByType = {
   hapoalim: (c) => c.userCode,
 };
 
-function getAccountIdentification(user) {
+function getAccountIdentification(user: UserOptions): string {
   return `${user.type}_${identifyAccountByType[user.type](user.credentials)}`;
 }
 
-export function getLastImport(account, state, since) {
+export function getLastImport(
+  account: UserOptions,
+  state: ImporterState['lastImport'],
+  since?: string,
+): Moment | null {
   // When override
   if (since) {
     return moment(since);
@@ -32,17 +44,17 @@ export function getLastImport(account, state, since) {
   }
 
   const accountIdentification = getAccountIdentification(account);
-  if (state[accountIdentification]) {
+  if (typeof state === 'object' && state[accountIdentification]) {
     return moment(state[accountIdentification]);
   }
 
   return null;
 }
 
-export function getStateWithLastImport(users, state) {
+export function getStateWithLastImport(users: UserOptions[], state: ImporterState): ImporterState {
   const now = moment().toISOString();
-  const lastState = typeof state.lastImport === 'string' ? {} : state.lastImport;
-  const newLastImport = users.reduce((m, u) => ({
+  const lastState: LastImportState = typeof state.lastImport === 'string' ? {} : state.lastImport ?? {};
+  const newLastImport = users.reduce<LastImportState>((m, u) => ({
     ...m,
     [getAccountIdentification(u)]: now,
   }), lastState);

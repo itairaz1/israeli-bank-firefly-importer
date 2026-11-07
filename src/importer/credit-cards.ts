@@ -2,16 +2,42 @@ import moment from 'moment';
 import config from 'nconf';
 import { getTxsByTag } from '../firefly.js';
 import logger from '../logger.js';
+import type {
+  AccountsMap,
+  CreditCardDescConfig,
+  CreditCardMethod,
+  FireflyTxInput,
+} from '../types.js';
 
-export default function manipulateTxs(txs, accountsMap) {
+interface CcDescEntry {
+  ids: string[];
+  method: CreditCardMethod;
+}
+
+type CcDesc = Record<string, CcDescEntry>;
+
+type ProcessMethod = (
+  tx: FireflyTxInput,
+  ccAccountsIds: string[],
+  accountsMap: AccountsMap,
+) => Promise<string | null>;
+
+export default function manipulateTxs(
+  txs: FireflyTxInput[],
+  accountsMap: AccountsMap,
+): Promise<FireflyTxInput[]> {
   const ccDesc = getCcDesc(accountsMap);
-  return txs.reduce(
+  return txs.reduce<Promise<FireflyTxInput[]>>(
     (m, tx) => m.then(async (x) => [...x, await manipulateTx(tx, ccDesc, accountsMap)]),
     Promise.resolve([]),
   );
 }
 
-async function manipulateTx(tx, ccDesc, accountsMap) {
+async function manipulateTx(
+  tx: FireflyTxInput,
+  ccDesc: CcDesc,
+  accountsMap: AccountsMap,
+): Promise<FireflyTxInput> {
   let newTx = tx;
   newTx = {
     ...newTx,
@@ -21,20 +47,21 @@ async function manipulateTx(tx, ccDesc, accountsMap) {
   return newTx;
 }
 
-function getCcDesc(accountsMap) {
+function getCcDesc(accountsMap: AccountsMap): CcDesc {
   const typeToIds = Object.values(accountsMap)
     .filter((x) => x.kind === 'credit-card')
     .map((x) => ({
       type: x.type,
       id: x.id,
     }))
-    .reduce((m, x) => ({
+    .reduce<Record<string, string[]>>((m, x) => ({
       ...m,
       [x.type]: [...(m[x.type] || []), x.id],
     }), {});
 
-  return config.get('creditCardDesc')
-    .reduce((m, x) => ({
+  const creditCardDesc: CreditCardDescConfig[] = config.get('creditCardDesc');
+  return creditCardDesc
+    .reduce<CcDesc>((m, x) => ({
       ...m,
       [x.desc]: {
         ids: typeToIds[x.creditCard] || [],
@@ -43,7 +70,7 @@ function getCcDesc(accountsMap) {
     }), {});
 }
 
-function ccTag(tx, accountsMap) {
+function ccTag(tx: FireflyTxInput, accountsMap: AccountsMap): string[] | null {
   const isCc = Object.values(accountsMap)
     .some((x) => x.kind === 'credit-card' && (x.id === tx.source_id || x.id === tx.destination_id));
   if (!isCc) {
@@ -54,17 +81,24 @@ function ccTag(tx, accountsMap) {
   return [`${accountId}_${processDate}`];
 }
 
-const methods = {
+const methods: Record<CreditCardMethod, ProcessMethod> = {
   'process-date': processByProcessDate,
   reference: processByReference,
 };
 
-async function processByReference(tx, ccAccountsIds, accountsMap) {
-  const accountNumber = tx.internal_reference;
+async function processByReference(
+  tx: FireflyTxInput,
+  ccAccountsIds: string[],
+  accountsMap: AccountsMap,
+): Promise<string | null> {
+  const accountNumber = String(tx.internal_reference);
   return accountsMap[accountNumber].id;
 }
 
-async function processByProcessDate(tx, ccAccountsIds) {
+async function processByProcessDate(
+  tx: FireflyTxInput,
+  ccAccountsIds: string[],
+): Promise<string | null> {
   const processDate = tx.process_date;
 
   let index;
@@ -87,7 +121,11 @@ async function processByProcessDate(tx, ccAccountsIds) {
   return ccAccountsIds[index];
 }
 
-async function ccTransfer(tx, ccDesc, accountsMap) {
+async function ccTransfer(
+  tx: FireflyTxInput,
+  ccDesc: CcDesc,
+  accountsMap: AccountsMap,
+): Promise<FireflyTxInput> {
   if (tx.type === 'transfer') {
     return tx;
   }
@@ -112,7 +150,7 @@ async function ccTransfer(tx, ccDesc, accountsMap) {
   };
 }
 
-async function getTxAmount(processDate, accountId) {
+async function getTxAmount(processDate: string, accountId: string): Promise<number> {
   let res = await getTxsByTag(`${accountId}_${processDate}`);
   if (res.length === 0) {
     const yd = moment(processDate)
@@ -121,6 +159,6 @@ async function getTxAmount(processDate, accountId) {
     res = await getTxsByTag(`${accountId}_${yd}`);
   }
   const txs = res.map((x) => x.attributes.transactions[0]);
-  const sum = txs.reduce((m, x) => (x.type === 'deposit' ? 1 : -1) * x.amount + m, 0);
+  const sum = txs.reduce((m, x) => (x.type === 'deposit' ? 1 : -1) * Number(x.amount) + m, 0);
   return Math.round(sum * 100) / 100;
 }

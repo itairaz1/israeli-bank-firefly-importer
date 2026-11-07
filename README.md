@@ -86,5 +86,12 @@ To report a bug please [create an issue](https://github.com/itairaz1/israeli-ban
 5. Installation type (Native / Docker / HA addon)
 6. Sensitized debug log - example of how to turn on debug logs [here](https://github.com/itairaz1/israeli-bank-firefly-importer/blob/main/config/example.yaml#L34). Make sure you going through the logs and remove any sensitive data.
 
+## Development
+The project is written in TypeScript (`src/`) and compiled to `dist/`.
+1. `npm install`
+2. `npm run build` - compile to `dist/` (`npm run typecheck` to only type-check).
+3. `CONFIG_FILE=./config.yaml npm start` - run the compiled importer.
+4. `npm run lint` - lint (and auto-fix) the sources.
+
 ## License
 [MIT License](LICENSE)

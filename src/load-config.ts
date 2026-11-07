@@ -4,7 +4,7 @@ import nconfYaml from 'nconf-yaml';
 
 const require = createRequire(import.meta.url);
 
-const envMap = {
+const envMap: Record<string, string> = {
   FIREFLY_BASE_URL: 'firefly:baseUrl',
   FIREFLY_TOKEN_API: 'firefly:tokenApi',
   CRON: 'cron',
@@ -16,11 +16,12 @@ const envMap = {
 config
   .defaults(require('../config/default.json'));
 
-export default async function loadConfig(path) {
+export default async function loadConfig(path: string): Promise<void> {
+  // nconf's typings declare remove() as void, but it returns the provider at runtime
+  config.remove('defaults');
   config
-    .remove('defaults')
     .env({
-      transform: (obj) => {
+      transform: (obj: { key: string; value: unknown }) => {
         if (!envMap[obj.key]) {
           return null;
         }
