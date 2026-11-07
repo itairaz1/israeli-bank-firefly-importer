@@ -8,7 +8,7 @@ RUN apt-get update \
     && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
     && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
     && apt-get update \
-    && apt-get install -y libxshmfence1 libglu1 google-chrome-stable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 \
+    && apt-get install -y libxshmfence1 libglu1 google-chrome-stable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 tini \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
@@ -38,4 +38,9 @@ COPY --chown=pptruser:pptruser . .
 # Compile TypeScript, then drop dev dependencies from the final image
 RUN npm run build && npm prune --omit=dev
 
+# Use tini as PID 1 so orphaned Chrome helper processes (chrome_crashpad, the
+# wrapper's `cat` pipes, zygotes) are reaped after each scrape. Without it, npm
+# runs as PID 1, never reaps adopted children, and zombies pile up on every cron
+# run. See https://github.com/itairaz1/israeli-bank-firefly-importer/issues/205
+ENTRYPOINT ["/usr/bin/tini", "--"]
 CMD ["npm", "start"]
