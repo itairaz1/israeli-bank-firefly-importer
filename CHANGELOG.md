@@ -1,3 +1,10 @@
+## [1.5.13](https://github.com/itairaz1/israeli-bank-firefly-importer/compare/v1.5.12...v1.5.13) (2026-11-07)
+
+
+### Bug Fixes
+
+* **bump:** bump minor/patch dependencies ([#314](https://github.com/itairaz1/israeli-bank-firefly-importer/issues/314)) ([766b93c](https://github.com/itairaz1/israeli-bank-firefly-importer/commit/766b93c6e2650edb14320bde426d97e4a7323538)), closes [#308](https://github.com/itairaz1/israeli-bank-firefly-importer/issues/308) [#309](https://github.com/itairaz1/israeli-bank-firefly-importer/issues/309) [#310](https://github.com/itairaz1/israeli-bank-firefly-importer/issues/310) [#312](https://github.com/itairaz1/israeli-bank-firefly-importer/issues/312) [#283](https://github.com/itairaz1/israeli-bank-firefly-importer/issues/283) [#242](https://github.com/itairaz1/israeli-bank-firefly-importer/issues/242) [#219](https://github.com/itairaz1/israeli-bank-firefly-importer/issues/219) [#311](https://github.com/itairaz1/israeli-bank-firefly-importer/issues/311) [#290](https://github.com/itairaz1/israeli-bank-firefly-importer/issues/290)
+
 ## [1.5.12](https://github.com/itairaz1/israeli-bank-firefly-importer/compare/v1.5.11...v1.5.12) (2026-07-03)
 
 
